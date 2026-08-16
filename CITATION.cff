@@ -1,0 +1,46 @@
+cff-version: 1.2.0
+title: >-
+  Reproduction package for "Facility Location under a Partially Identified
+  Demand Coupling: Aircraft Bases for Time-Critical Organ Transport in Poland"
+message: >-
+  If you use this software or data, please cite both the software and the
+  associated manuscript.
+type: software
+authors:
+  - given-names: Maciej M.
+    family-names: Kasperek
+    orcid: 'https://orcid.org/0009-0008-7419-0851'
+    email: maciej_kasperek@protonmail.ch
+    affiliation: Independent researcher, Opole, Poland
+version: 1.0.0
+date-released: '2026-08-09'
+license: Apache-2.0
+license-url: 'https://www.apache.org/licenses/LICENSE-2.0'
+keywords:
+  - facility location
+  - p-center
+  - minimax
+  - partial identification
+  - robust optimization
+  - organ transport
+  - air medical transport
+  - operational research
+  - reproducibility
+abstract: >-
+  Code, input data, and scripts reproducing every figure and every number in
+  the manuscript. The work locates three short takeoff and landing aircraft
+  bases for time-critical organ transport in Poland, using a minimax criterion
+  over admissible source-centre pairs, because no central record of
+  donor-recipient pairs is kept. All four location models are solved by
+  exhaustive enumeration of the 5456 airfield triples, so the optima are exact.
+references:
+  - type: article
+    title: >-
+      Facility Location under a Partially Identified Demand Coupling: Aircraft
+      Bases for Time-Critical Organ Transport in Poland
+    authors:
+      - given-names: Maciej M.
+        family-names: Kasperek
+        orcid: 'https://orcid.org/0009-0008-7419-0851'
+    year: 2026
+    status: submitted

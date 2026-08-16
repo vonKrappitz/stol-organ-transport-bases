@@ -1,0 +1,14 @@
+icao,pas_glowny_m,szerokosc_m,nawierzchnia,godziny_admin_UTC_zima,H24,uwagi,zrodlo_1,zrodlo_2
+EPWA,2800/3690,50/60,ASPH/CONC,H24,tak,dwa pasy 11/29 i 15/33,eAIP AD2 EPWA AIRAC 07-26,Wikipedia
+EPGD,2800,45,ASPH/CONC,H24,tak,,eAIP AD2 EPGD AIRAC 07-26,Wikipedia
+EPKT,3200,45,ASPH/CONC,H24,tak,,eAIP AD2 EPKT AIRAC 07-26,Wikipedia (3200 m 2015)
+EPKK,2550,60,CONC,H24,tak,,eAIP AD2 EPKK AIRAC 07-26,Wikipedia
+EPLL,2500,45,ASPH/CONC,0600-2200 (0500-2100) patrz NOTAM,nie,,eAIP AD2 EPLL AIRAC 07-26,Wikipedia
+EPPO,2504,50,ASPH/CONC,H24 z zastrz.,warunkowo,okna niedostepnosci wg AD 2.21.4 i 2.23.1 (wspoluzytkowanie wojskowe),eAIP AD2 EPPO AIRAC 07-26,Wikipedia
+EPRZ,3200,45,ASPH/CONC,H24,tak,ILS CAT II,eAIP AD2 EPRZ AIRAC 07-26,rzeszowairport.pl (3200 m; otwarte dzien i noc caly rok)
+EPSC,2500,60,ASPH,0700-0000 (0600-2300) patrz NOTAM,nie,,eAIP AD2 EPSC AIRAC 07-26,Wikipedia
+EPMO,2500,45,ASPH/CONC,H24,tak,,eAIP AD2 EPMO AIRAC 07-26,Wikipedia
+EPWR,2503,45,ASPH/CONC,H24,tak,,eAIP AD2 EPWR AIRAC 07-26,Wikipedia
+EPZG,2501,60,CONC,MON-FRI 0600-2100 (0500-2000) SUN 1300-2100 (1200-2000),nie,sobota niepublikowana w AD 2.3 poz.1,eAIP AD2 EPZG AIRAC 07-26,Wikipedia
+EPLB,2520,45,ASPH/CONC,0700-1900 (0600-1800) patrz NOTAM,nie,,eAIP AD2 EPLB AIRAC 07-26,Wikipedia
+EPRA,2500,45,CONC,0500-2100 (0400-2000),nie,certyfikacja ograniczona (wg wczesniejszego przegladu rejestru ULC),eAIP AD2 EPRA AIRAC 07-26,Wikipedia

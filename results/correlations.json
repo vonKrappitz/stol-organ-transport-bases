@@ -1,0 +1,37 @@
+{
+  "variants": {
+    "(a) pairs with disclosed count": {
+      "n": 50,
+      "spearman": 0.015,
+      "p_spearman": 0.9185872323803564,
+      "kendall": 0.01,
+      "p_kendall": 0.923654333274561
+    },
+    "(b) occurring pairs, cens=2": {
+      "n": 130,
+      "spearman": 0.05,
+      "p_spearman": 0.5742874945826776,
+      "kendall": 0.037,
+      "p_kendall": 0.5628863932698493
+    },
+    "(c) all 240 pairs, zeros": {
+      "n": 240,
+      "spearman": 0.322,
+      "p_spearman": 3.541313415599109e-07,
+      "kendall": 0.256,
+      "p_kendall": 4.745537436954545e-07
+    }
+  },
+  "against_distance": {
+    "observed_vs_distance": {
+      "spearman": -0.617,
+      "p": 5.2135354500608574e-15,
+      "n": 130
+    },
+    "proxy_vs_distance": {
+      "spearman": 0.236,
+      "p": 0.006858274620694388,
+      "n": 130
+    }
+  }
+}

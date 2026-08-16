@@ -1,0 +1,54 @@
+icao,nazwa,voivodeship,dlugosc_m,surface,lighting,wojskowe,tryb,lat,lon
+EPWA,Warsaw,mazowieckie,3690,ASPH,yes,no,optimum,52.1657,20.9671
+EPPW,Powidz,wielkopolskie,3525,CON,yes,yes,optimum,52.3801,17.8532
+EPKT,Katowice,śląskie,3200,CON,yes,no,optimum,50.476,19.0807
+EPRZ,Jasionka,podkarpackie,3200,CON,yes,no,optimum,50.1098,22.0242
+EPLK,Łask,łódzkie,3000,CON,yes,yes,optimum,51.5517,19.1791
+EPGD,Gdańsk,pomorskie,2800,ASP,yes,no,optimum,54.3776,18.4662
+EPKK,Balice,małopolskie,2550,CON,yes,no,optimum,50.0777,19.7848
+EPLB,Lublin,lubelskie,2520,ASPHALT,yes,no,optimum,51.2402,22.7135
+EPSW,Lublin,lubelskie,2520,asphalt,yes,no,optimum,51.2319,22.6903
+EPMM,Minsk Mazowiecki Military Air Base,mazowieckie,2513,CON,yes,yes,optimum,52.1955,21.6559
+EPCE,Siemirowice,pomorskie,2504,ASP,no,yes,optimum,54.4165,17.7657
+EPPO,Poznań,wielkopolskie,2504,ASP,yes,no,optimum,52.4216,16.8234
+EPWR,Wrocław,dolnośląskie,2503,CONC-ASPH,yes,no,optimum,51.1037,16.8821
+EPBY,Bydgoszcz,kuj-pom,2500,CON,yes,no,optimum,53.0968,17.9777
+EPDE,Dęblin,lubelskie,2500,ASP,yes,yes,optimum,51.551,21.8923
+EPKS,Poznań,wielkopolskie,2500,CON,yes,yes,optimum,52.3317,16.9664
+EPLL,Łódź,łódzkie,2500,ASPH-CONC,yes,no,optimum,51.7219,19.3981
+EPLY,Leźnica Wielka,łódzkie,2500,ASP,yes,yes,optimum,52.0049,19.1438
+EPMB,Królewo,pomorskie,2500,CON,yes,yes,optimum,54.0266,19.1357
+EPMI,Mirosławiec,zach-pom,2500,CON,yes,yes,optimum,53.3951,16.0828
+EPMO,Nowy Dwór Mazowiecki,mazowieckie,2500,ASP,no,no,optimum,52.4511,20.6518
+EPRA,Radom,mazowieckie,2500,ASP,yes,no,optimum,51.3894,21.2147
+EPSC,Szczecin(Glewice),zach-pom,2500,ASP,yes,no,optimum,53.5847,14.9022
+EPSY,Szymany,warm-maz,2500,CON,yes,no,optimum,53.4819,20.9377
+EPZG,Nowe Kramsko,lubuskie,2500,CON,yes,no,optimum,52.1385,15.7986
+EPSN,Swidwin Military Air Base,zach-pom,2499,CON,yes,yes,optimum,53.7906,15.8263
+PL-0273,Sochaczew Air Base,mazowieckie,2499,ASP,no,yes,optimum,52.1986,20.2928
+EPOK,Kosakowo,pomorskie,2496,CON,yes,yes,optimum,54.5797,18.5172
+EPML,Mielec,podkarpackie,2492,CON,yes,no,optimum,50.3223,21.4621
+EPPI,Piła,wielkopolskie,2401,PEM,yes,no,optimum,53.1701,16.7111
+EPRU,Rudniki,śląskie,2000,CON,no,no,optimum,50.8847,19.2018
+EPTM,Nowy Glinnik,łódzkie,1999,ASP,no,yes,optimum,51.5844,20.0978
+PL-0001,Pobiedziska,wielkopolskie,1900,CON,no,no,optimum,52.5344,17.2188
+EPSU,Suwałki,podlaskie,1319,ASP,no,no,optimum,54.0728,22.8992
+EPBC,Warsaw,mazowieckie,1300,CON,yes,no,optimum,52.2692,20.9072
+EPTO,Toruń,kuj-pom,1269,CON,no,no,optimum,53.0292,18.5459
+EPKN,Kamień Śląski,opolskie,1200,CON,no,no,optimum,50.5306,18.0793
+EPAR,Wola Korzeniecka,podkarpackie,1193,ASP,no,no,optimum,49.6575,22.5143
+EPPG,Kąkolewo,wielkopolskie,1190,Concrete,yes,yes,optimum,52.235,16.243
+EPPR,Pruszcz Gdański,pomorskie,1166,ASP,no,yes,optimum,54.248,18.6716
+EPKA,Kielce,świętokrzyskie,1155,asphalt concrete,yes,no,optimum,50.8967,20.7317
+EPKM,Katowice,śląskie,1109,CON,no,no,optimum,50.2382,19.0337
+EPKR,Krosno,podkarpackie,1100,ASP,yes,no,optimum,49.6838,21.741
+EPCD,Królewskie,lubelskie,1020,CON,no,no,optimum,51.0821,23.437
+EPLU,Lubin Airfield,dolnośląskie,1000,ASP,yes,no,optimum,51.423,16.1962
+EPKW,Kaniów,śląskie,995,ASP,yes,no,optimum,49.9416,19.0196
+EPPT,Piotrków Trybunalski,łódzkie,950,CON,no,no,optimum,51.3831,19.6883
+EPGL,Gliwice,śląskie,900,Ashpalt,yes,no,optimum,50.2687,18.6725
+EPRJ,Nowa Wieś,podkarpackie,900,ASPH,yes,no,optimum,50.1042,22.047
+EPKG,Bagicz,zach-pom,892,Concrete,no,no,optimum,54.2001,15.6838
+EPOD,Olsztyn,warm-maz,850,ASP,no,no,optimum,53.7739,20.4135
+EPKC,Kraków,małopolskie,739,CON,no,no,awaryjny,50.0844,19.9903
+EPLS,Leszno,wielkopolskie,700,grass paved with a plastic grille,yes,no,awaryjny,51.835,16.5219

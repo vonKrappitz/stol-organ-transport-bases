@@ -1,0 +1,21 @@
+{
+ "optimum_min": 143.5,
+ "optimal_triples": 14,
+ "within_5min": 126,
+ "within_10min": 722,
+ "necessary_bases": [
+  "EPML"
+ ],
+ "share": {
+  "EPML": 14,
+  "EPSY": 6,
+  "EPBK": 4,
+  "EPSU": 4,
+  "EPBY": 3,
+  "EPPI": 3,
+  "EPPO": 3,
+  "EPSC": 3,
+  "EPLS": 1,
+  "EPZG": 1
+ }
+}

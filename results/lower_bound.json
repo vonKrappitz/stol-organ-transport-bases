@@ -1,0 +1,10 @@
+{
+ "lower_bound_min": 125.2,
+ "binds": [
+  "podkarpackie",
+  "Szczecin",
+  "lungs"
+ ],
+ "optimum_p3_min": 143.5,
+ "gap_min": 18.3
+}

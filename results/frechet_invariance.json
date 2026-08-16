@@ -1,0 +1,21 @@
+{
+ "bases_robust": [
+  "EPBC",
+  "EPKM",
+  "EPPO"
+ ],
+ "bases_independence": [
+  "EPBC",
+  "EPKM",
+  "EPPO"
+ ],
+ "bases_optimistic": [
+  "EPBC",
+  "EPKM",
+  "EPPO"
+ ],
+ "min_min_min": 45.044583536744355,
+ "min_max_min": 89.05278464368249,
+ "independence_min": 71.06865438845857,
+ "invariance": true
+}

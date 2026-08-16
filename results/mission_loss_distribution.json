@@ -1,0 +1,12 @@
+{
+  "mean_loss_min": 8.0,
+  "share_loss_under_10min_pct": 58.6,
+  "share_flight_over_500km_pct": 1.8,
+  "bands": {
+    "STOL faster": 29.0,
+    "0–5 min": 10.1,
+    "5–10 min": 19.5,
+    "10–20 min": 19.9,
+    ">20 min": 21.5
+  }
+}

@@ -1,0 +1,68 @@
+icao,nazwa,tw_max,tr_max,swiatla_OA,noc_eAIP,jeta1,prog_baza,prog_kons
+EPBA,Bielsko-Biała Aleksandrowice A,0,510,0,1,0,0,0
+EPBC,Warsaw Babice Airport,1300,1000,1,1,1,1,1
+EPBH,Bydgoszcz Baza Lpr Heliport,0,0,0,0,1,0,0
+EPBK,Białystok-Krywlany Airfield,1350,840,0,0,0,1,1
+EPBO,?,0,0,0,1,0,0,0
+EPCD,Depułtycze Królewskie Airfield,1020,800,0,1,0,1,1
+EPEL,Elbląg Airfield,0,913,0,0,0,1,0
+EPGE,Giże Airfield,0,0,0,0,0,0,0
+EPGI,Grudziądz Lisie Kąty Airfield,0,1060,0,0,0,1,1
+EPGL,Gliwice-Trynek Airfield,0,900,1,0,0,1,0
+EPGY,Grądy Airfield,0,0,0,0,0,0,0
+EPIN,Inowrocław Airfield,0,0,0,0,0,0,0
+EPJG,Jelenia Góra Airfield,0,0,0,0,0,0,0
+EPJS,Jeżów Sudecki Airfield,0,0,0,0,0,0,0
+EPKA,Kielce-Masłów Airfield,1155,900,1,0,1,1,1
+EPKC,?,0,0,0,0,0,0,0
+EPKE,Kȩtrzyn-Wilamowo Airfield,0,0,0,0,1,0,0
+EPKG,?,0,0,0,0,0,0,0
+EPKH,?,0,0,0,0,1,0,0
+EPKI,Kikity,0,732,0,0,0,0,0
+EPKM,Katowice-Muchowiec Airfield,1109,0,0,0,0,1,1
+EPKO,?,0,0,0,0,0,0,0
+EPKP,Pobiednik Wielki Airfield,0,1000,0,0,1,1,0
+EPKR,Krosno Airfield,1100,1035,1,0,0,1,1
+EPKW,Bielsko-Biała Kaniów Airfield,995,0,1,0,1,1,1
+EPKX,Kokotowie LPR HEMS Heliport,0,0,0,0,1,0,0
+EPLI,?,0,0,0,0,0,0,0
+EPLR,Lublin Radwiec Airfield,0,0,0,0,0,0,0
+EPLS,Leszno-Strzyzewice Airfield,700,1320,1,1,1,1,1
+EPLU,Lubin Airfield,1000,900,1,0,1,1,1
+EPMR,Mirosławice Private Airfield,0,845,0,0,0,0,0
+EPMX,Milewo Airfield,0,0,0,0,0,0,0
+EPMY,Myślibórz-Giżyn Airfield,0,920,1,0,0,1,0
+EPNC,?,0,0,0,0,1,0,0
+EPNL,Nowy Sącz-Łososina Dolna Airfi,0,800,0,0,0,0,0
+EPNT,Nowy Targ Airfield,0,1680,0,0,0,1,1
+EPOM,Ostrów Wielkopolski Michałków ,0,0,0,0,0,0,0
+EPOP,Opole-Polska Nowa Wieś Airfiel,0,0,0,0,0,0,0
+EPPB,?,0,0,0,0,0,0,0
+EPPG,?,0,0,0,0,0,0,0
+EPPI,Piła Airfield,2401,0,1,0,0,1,1
+EPPK,Poznań-Kobylnica Airfield,0,750,1,0,0,0,0
+EPPL,Płock Airfield,0,0,0,0,0,0,0
+EPPT,Piotrków Trybunalski-Bujny Air,950,0,0,0,1,1,1
+EPPZ,?,0,0,0,0,0,0,0
+EPRD,Mazury Air Camp Airfield,0,0,0,0,0,0,0
+EPRG,Rybnik-Gotartowice Glider Fiel,0,0,0,0,0,0,0
+EPRJ,Rzeszów Sports Airfield,900,746,1,1,0,1,1
+EPRP,Radom-Piastrów Airfield,0,0,0,1,0,0,0
+EPRU,Częstochowa-Rudniki Airport,810,2600,0,0,0,1,1
+EPSA,?,0,0,0,0,1,0,0
+EPSD,Szczecin-Dąbie Airfield,0,1000,0,0,0,1,0
+EPSK,Słupsk-Krȩpa Airfield,0,0,0,0,0,0,0
+EPSL,?,0,0,0,0,0,0,0
+EPSS,Świdnica - Krzczonów Airstrip,0,0,0,0,0,0,0
+EPST,Stalowa Wola-Turbia Airfield,0,930,0,0,0,1,0
+EPSU,Suwałki Airfield,1319,0,0,1,1,1,1
+EPSW,Świdnik Airfield,0,0,1,0,1,0,0
+EPTO,Toruń Airfield,1269,851,0,0,0,1,1
+EPWK,Włocławek-Kruszyn Airfield,0,1000,0,0,0,1,0
+EPWS,Wrocław-Szymanów Airfield,0,770,0,0,0,0,0
+EPWT,?,0,0,0,0,0,0,0
+EPZA,Zamość-Mokre Airfield,0,800,0,0,1,0,0
+EPZE,?,0,0,0,0,0,0,0
+EPZP,Zielona Góra-Przylep Airfield,0,880,0,1,0,0,0
+EPZR,Żar Airfield,0,0,0,0,0,0,0
+EPZW,?,0,0,0,0,0,0,0

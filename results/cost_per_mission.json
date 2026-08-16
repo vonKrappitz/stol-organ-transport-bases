@@ -1,0 +1,17 @@
+{
+  "STOL Caravan EX": {
+    "hours_per_mission": 2.13,
+    "cost_per_mission_usd": 2129.0,
+    "ratio_to_caravan": 1.0
+  },
+  "Piaggio P180": {
+    "hours_per_mission": 1.83,
+    "cost_per_mission_usd": 4581.0,
+    "ratio_to_caravan": 2.15
+  },
+  "Learjet 45": {
+    "hours_per_mission": 1.66,
+    "cost_per_mission_usd": 4641.0,
+    "ratio_to_caravan": 2.18
+  }
+}

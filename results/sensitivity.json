@@ -1,0 +1,135 @@
+{
+  "baseline": {
+    "worst_min": 143.5,
+    "bases": [
+      "EPBK",
+      "EPBY",
+      "EPML"
+    ],
+    "airfields": 33
+  },
+  "runway_threshold_m": {
+    "700": {
+      "worst_min": 134.7,
+      "bases": [
+        "EPBK",
+        "EPPI",
+        "EPST"
+      ],
+      "airfields": 40
+    },
+    "750": {
+      "worst_min": 134.7,
+      "bases": [
+        "EPBK",
+        "EPPI",
+        "EPST"
+      ],
+      "airfields": 40
+    },
+    "800": {
+      "worst_min": 143.5,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ],
+      "airfields": 33
+    },
+    "875": {
+      "worst_min": 143.5,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ],
+      "airfields": 33
+    },
+    "900": {
+      "worst_min": 143.5,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ],
+      "airfields": 33
+    },
+    "1000": {
+      "worst_min": 143.5,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ],
+      "airfields": 33
+    }
+  },
+  "speed": {
+    "VH200_VS330": {
+      "worst_min": 144.8,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ]
+    },
+    "VH240_VS330": {
+      "worst_min": 143.5,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ]
+    },
+    "VH280_VS330": {
+      "worst_min": 142.5,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ]
+    },
+    "VH240_VS280": {
+      "worst_min": 167.0,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ]
+    },
+    "VH240_VS380": {
+      "worst_min": 126.1,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ]
+    }
+  },
+  "sources": {
+    "centroids": {
+      "worst_min": 143.5,
+      "bases": [
+        "EPBK",
+        "EPBY",
+        "EPML"
+      ]
+    },
+    "osrodki": {
+      "worst_min": 125.1,
+      "bases": [
+        "EPBY",
+        "EPRU",
+        "EPSC"
+      ]
+    },
+    "airports": {
+      "worst_min": 155.2,
+      "bases": [
+        "EPBC",
+        "EPBY",
+        "EPRJ"
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+BASELINE VALIDATION: 143.5 min, bases ('EPBK', 'EPBY', 'EPML'), |AF|=33
+  expected: 143.5 min, ('EPBK','EPBY','EPML'), 33
+  MATCHES
+
+
+########## A. SENSITIVITY TO SPEEDS (baseline VH=240, VS=330) ##########
+  setting                   result     status  bases
+  VH=204 VS=280                 168.2 min  = baseline EPBK,EPBY,EPML  
+  VH=204 VS=330                 144.6 min  = baseline EPBK,EPBY,EPML  
+  VH=204 VS=380                 127.3 min  = baseline EPBK,EPBY,EPML  
+  VH=240 VS=280                 167.0 min  = baseline EPBK,EPBY,EPML  
+  VH=240 VS=330                 143.5 min  = baseline EPBK,EPBY,EPML  
+  VH=240 VS=380                 126.1 min  = baseline EPBK,EPBY,EPML  
+  VH=276 VS=280                 166.1 min  = baseline EPBK,EPBY,EPML  
+  VH=276 VS=330                 142.6 min  = baseline EPBK,EPBY,EPML  
+  VH=276 VS=380                 125.3 min  = baseline EPBK,EPBY,EPML  
+  --> base triple unchanged in 9/9 speed combinations
+
+########## B. SENSITIVITY TO RUNWAY THRESHOLD (baseline 750 m) ##########
+  setting                   result     status  bases
+  threshold=700 m  (|AF|=40)    134.7 min  CHANGED EPBK,EPPI,EPST  
+  threshold=750 m  (|AF|=40)    134.7 min  CHANGED EPBK,EPPI,EPST  
+  threshold=800 m  (|AF|=33)    143.5 min  = baseline EPBK,EPBY,EPML  
+  threshold=900 m  (|AF|=33)    143.5 min  = baseline EPBK,EPBY,EPML  
+  threshold=1000 m  (|AF|=33)   143.5 min  = baseline EPBK,EPBY,EPML  
+  --> base triple unchanged in 3/5 thresholds
+
+########## C. SENSITIVITY TO THE SOURCE SET ##########
+  setting                   result     status  bases
+  16 voivodeship centroids (baseline)  143.5 min  = baseline EPBK,EPBY,EPML  
+  9 centre cities as sources    125.1 min  CHANGED EPBY,EPRU,EPSC  
+  33 airfields, fully demand-free  155.2 min  CHANGED EPBC,EPBY,EPRJ  
+
+########## STABILITY SUMMARY ##########
+  Speed and threshold perturbations in total: 14
+  Triple Bialystok, Bydgoszcz, Mielec retained: 12/14
+  Worst time across the speed grid: 125 do 168 min
+  saved results/sensitivity.json

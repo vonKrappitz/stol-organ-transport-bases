@@ -1,0 +1,18 @@
+# Core computation. Scripts 01 to 05, 09, 11, 12, 15, 19 to 24 need only these.
+numpy>=1.24
+scipy>=1.10
+
+# Figures.
+matplotlib>=3.7
+Pillow>=10.0
+
+# Maps. Scripts 06, 07, 08, 14 draw voivodeship boundaries.
+shapely>=2.0
+
+# Spreadsheet reading. Script 16 reads the payer workbook.
+openpyxl>=3.1
+
+# Geocoding, only for script 03, which is skipped when the cached
+# boundary file is present.
+requests>=2.31
+geopy>=2.3

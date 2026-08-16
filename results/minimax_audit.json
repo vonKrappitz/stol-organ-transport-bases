@@ -1,0 +1,87 @@
+{
+  "S1 civil base set (triple+13cert+AD4 base)": {
+    "airfields": 40,
+    "p": {
+      "2": {
+        "worst_min": 147.7,
+        "bases": "EPBY(Bydgoszcz), EPLB(Lublin)"
+      },
+      "3": {
+        "worst_min": 134.7,
+        "bases": "EPBK(Białystok), EPPI(Piła), EPST(Zaleszany)"
+      },
+      "4": {
+        "worst_min": 130.3,
+        "bases": "EPBK(Białystok), EPCD(Królewskie), EPML(Mielec), EPPI(Piła)"
+      }
+    }
+  },
+  "S2 conservative (triple+13cert+AD4 cons)": {
+    "airfields": 33,
+    "p": {
+      "2": {
+        "worst_min": 150.0,
+        "bases": "EPBY(Bydgoszcz), EPLB(Lublin)"
+      },
+      "3": {
+        "worst_min": 143.5,
+        "bases": "EPBK(Białystok), EPBY(Bydgoszcz), EPML(Mielec)"
+      },
+      "4": {
+        "worst_min": 134.0,
+        "bases": "EPBK(Białystok), EPCD(Królewskie), EPML(Mielec), EPPI(Piła)"
+      }
+    }
+  },
+  "S1b base set without conditional EPPI": {
+    "airfields": 39,
+    "p": {
+      "2": {
+        "worst_min": 147.7,
+        "bases": "EPBY(Bydgoszcz), EPLB(Lublin)"
+      },
+      "3": {
+        "worst_min": 137.7,
+        "bases": "EPMY(Nowogródek P), EPST(Zaleszany), EPSY(Szymany)"
+      },
+      "4": {
+        "worst_min": 134.7,
+        "bases": "EPBK(Białystok), EPBY(Bydgoszcz), EPMY(Nowogródek P), EPST(Zaleszany)"
+      }
+    }
+  },
+  "S3 night H24 (7 cert H24)": {
+    "airfields": 7,
+    "p": {
+      "2": {
+        "worst_min": 200.0,
+        "bases": "EPWA(Warsaw), EPKK(Balice)"
+      },
+      "3": {
+        "worst_min": 200.0,
+        "bases": "EPWA(Warsaw), EPGD(Gdańsk), EPKK(Balice)"
+      },
+      "4": {
+        "worst_min": 200.0,
+        "bases": "EPWA(Warsaw), EPGD(Gdańsk), EPKT(Katowice), EPKK(Balice)"
+      }
+    }
+  },
+  "S4 civil+MIL (S1+14 military)": {
+    "airfields": 54,
+    "p": {
+      "2": {
+        "worst_min": 147.7,
+        "bases": "EPBY(Bydgoszcz), EPLB(Lublin)"
+      },
+      "3": {
+        "worst_min": 131.7,
+        "bases": "EPBK(Białystok), EPBY(Bydgoszcz), EPST(Zaleszany)"
+      },
+      "4": {
+        "worst_min": 129.5,
+        "bases": "EPBK(Białystok), EPCD(Królewskie), EPML(Mielec), EPPI(Piła)"
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "Minimax (worst case)": {
+    "bases_icao": [
+      "EPBK",
+      "EPBY",
+      "EPML"
+    ],
+    "bases_cities": [
+      "Białystok",
+      "Bydgoszcz",
+      "Mielec"
+    ],
+    "worst_min": 143.5,
+    "weighted_mean_min": 80.6,
+    "coverage_135_pct": 91.1
+  },
+  "Donor-weighted p-median": {
+    "bases_icao": [
+      "EPBC",
+      "EPKM",
+      "EPPO"
+    ],
+    "bases_cities": [
+      "Warsaw",
+      "Katowice",
+      "Poznań"
+    ],
+    "worst_min": 164.4,
+    "weighted_mean_min": 71.1,
+    "coverage_135_pct": 74.6
+  },
+  "Geographic p-median": {
+    "bases_icao": [
+      "EPKA",
+      "EPPO",
+      "EPSY"
+    ],
+    "bases_cities": [
+      "Kielce",
+      "Poznań",
+      "Szymany"
+    ],
+    "worst_min": 148.5,
+    "weighted_mean_min": 75.7,
+    "coverage_135_pct": 85.9
+  },
+  "Worst-case coverage 135 min": {
+    "bases_icao": [
+      "EPKR",
+      "EPLB",
+      "EPPI"
+    ],
+    "bases_cities": [
+      "Krosno",
+      "Lublin",
+      "Piła"
+    ],
+    "worst_min": 150.0,
+    "weighted_mean_min": 83.3,
+    "coverage_135_pct": 97.0
+  }
+}

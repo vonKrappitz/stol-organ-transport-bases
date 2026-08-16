@@ -1,0 +1,20 @@
+{
+  "stary": {
+    "worst_min": 143.5,
+    "bases": [
+      "EPBK",
+      "EPBY",
+      "EPML"
+    ],
+    "binding": "lubelskie"
+  },
+  "nowy": {
+    "worst_min": 133.9,
+    "bases": [
+      "EPCD",
+      "EPKA",
+      "EPSY"
+    ],
+    "binding": "podlaskie"
+  }
+}

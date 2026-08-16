@@ -1,0 +1,14 @@
+{
+ "draws": 200,
+ "range": [
+  0.8,
+  1.2
+ ],
+ "invariance_held": 200,
+ "same_triple": 131,
+ "base_triple": [
+  "Katowice",
+  "Poznań",
+  "Warsaw"
+ ]
+}

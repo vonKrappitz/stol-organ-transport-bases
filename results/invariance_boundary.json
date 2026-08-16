@@ -1,0 +1,22 @@
+{
+ "variant": "free choice airfields",
+ "invariance": false,
+ "bases_max": [
+  "EPBC",
+  "EPBY",
+  "EPKT"
+ ],
+ "bases_ind": [
+  "EPBY",
+  "EPKT",
+  "EPWA"
+ ],
+ "bases_min": [
+  "EPBY",
+  "EPKM",
+  "EPWA"
+ ],
+ "min_max_min": 81.34028279292738,
+ "ind_min": 63.957667543443776,
+ "min_min_min": 41.78126664687333
+}
