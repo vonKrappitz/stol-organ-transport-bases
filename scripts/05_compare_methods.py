@@ -109,7 +109,7 @@ def o_pmedU(t):
     for si,sc in enumerate(src):
         pos=min(D[si][b] for b in t)/VS; s+=max(sc["heli"],ST+pos)+sc["davg"]
     return s
-def o_stol(t):  # tylko STOL: pozycj + najgorszy transport, bez heli
+def o_stol(t):  # STOL only: positioning + worst transport, no helicopter
     mx=0
     for si,sc in enumerate(src):
         pos=min(D[si][b] for b in t)/VS
