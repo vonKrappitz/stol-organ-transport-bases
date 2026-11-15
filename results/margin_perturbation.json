@@ -1,12 +1,12 @@
 {
- "draws": 200,
- "range": [
+ "losowan": 200,
+ "zakres": [
   0.8,
   1.2
  ],
- "invariance_held": 200,
- "same_triple": 131,
- "base_triple": [
+ "niezmienniczosc_utrzymana": 200,
+ "ta_sama_trojka": 131,
+ "trojka_bazowa": [
   "Katowice",
   "Poznań",
   "Warsaw"

@@ -1,5 +1,6 @@
 {
   "mean_loss_min": 8.0,
+  "median_flight_km": 253,
   "share_loss_under_10min_pct": 58.6,
   "share_flight_over_500km_pct": 1.8,
   "bands": {

@@ -1,5 +1,4 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SCRIPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -10,12 +9,12 @@ _DATA_DIR   = _os.path.join(_REPO_DIR, "data")
 RESULTS      = _os.path.join(_REPO_DIR, "results")     # figures and CSV go here
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DATA_DIR)                                  # bare paths read from data/
-# end of path block
+# --- end of the path block ---
 
 import csv, re, json, math
 from itertools import combinations
 
-# audited set AUDYT33 (conservative, after the infrastructure audit)
+# ---------- pre-audit set: hard runway of 750 m or more (51 airfields) ----------
 keep={"small_airport","medium_airport","large_airport"}
 ap={}
 with open("airports.csv",newline='',encoding="utf-8") as f:
@@ -43,8 +42,8 @@ for a,d in ap.items():
         AF.append({"icao":d["icao"],"muni":d["muni"],"lat":d["lat"],"lon":d["lon"]})
 print("Airfields in the optimum set:",len(AF))
 
-# geo: centroids + centres
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8"))
+# ---------- geo: centroids + centres ----------
+g=json.load(open("voivodeship_boundaries.json"))
 CENT=g["cent"]; OSR=g["osr"]
 
 # ---------- demand weights, mean 2020-2024 ----------
@@ -66,7 +65,7 @@ def hav(lat1,lon1,lat2,lon2):
     a=math.sin(dp/2)**2+math.cos(p1)*math.cos(p2)*math.sin(dl/2)**2
     return 2*R*math.asin(math.sqrt(a))
 
-VH,VS=240.0,330.0; STARTUP=5/60  # h ; 104 km zasieg feeder
+VH,VS=240.0,330.0; STARTUP=5/60  # hours
 ORG={"heart":["Gdańsk","Kraków","Poznań","Warszawa","Wrocław","Zabrze"],
 "lungs":["Gdańsk","Kraków","Poznań","Szczecin","Warszawa","Zabrze"],
 "liver":["Bydgoszcz","Gdańsk","Katowice","Szczecin","Warszawa","Wrocław"]}
@@ -83,7 +82,7 @@ cair={}
 print("\n--- centres: nearest airfield ---")
 for c,(la,lo) in OSR.items():
     i,d=nearest(la,lo); cair[c]=(i,d)
-    flag=" >104!" if d>104 else ""
+    flag=" >100!" if d>100 else ""
     print(f"  {c:11} -> {AF[i]['icao']} {AF[i]['muni'][:18]:18} {d:5.1f} km{flag}")
 
 # sources (centroids) -> nearest airfield, feeder, and the worst eligible centre per organ
@@ -91,7 +90,7 @@ print("\n--- sources: nearest airfield + worst target ---")
 src=[]
 for k,(la,lo) in CENT.items():
     i,d=nearest(la,lo)
-    # worst target: max over organs and centres of (transport A_O->A_C)/VS + (feeder C)/VH
+    # worst target: the maximum over organs and centres of flight/VS + centre feeder/VH
     worst=0; wlbl=None
     for g_,cl in ORG.items():
         for c in cl:
@@ -99,8 +98,8 @@ for k,(la,lo) in CENT.items():
             t=hav(AF[i]["lat"],AF[i]["lon"],AF[ci]["lat"],AF[ci]["lon"])/VS + cd/VH
             if t>worst: worst=t; wlbl=(g_,c)
     src.append({"woj":k,"ai":i,"feeder":d/VH,"helikm":d,"dest":worst,"dlbl":wlbl,"w":wgt(k)})
-    fl=" >104!" if d>104 else ""
-    print(f"  {k:20} -> {AF[i]['icao']:6} {d:5.1f}km{fl}  worst: {wlbl[0]:7} {wlbl[1]:9} ({worst*60:4.0f} min lot)")
+    fl=" >100!" if d>100 else ""
+    print(f"  {k:20} -> {AF[i]['icao']:6} {d:5.1f}km{fl}  worst: {wlbl[0]:7} {wlbl[1]:9} ({worst*60:4.0f} min flight)")
 
 # distance matrix from a base airfield to a source airfield
 SA=sorted({s["ai"] for s in src})  # unique source airfields
@@ -124,10 +123,10 @@ for p in (2,3,4):
     # which source binds the worst case
     binder=max(src,key=lambda s:max(s["feeder"],STARTUP+min(D[src.index(s)][b] for b in tri)/VS)+s["dest"])
     print(f"\n===== MINIMAX p={p} =====")
-    print(f"  Worst flight time (excluding handovers): {val*60:.1f} min  ({val:.2f} h)")
+    print(f"  Worst mission time (excluding handovers): {val*60:.1f} min  ({val:.2f} h)")
     print(f"  Bases: {bases}")
     if p==3:
         si=src.index(binder)
         pos=min(D[si][b] for b in tri)/VS
         print(f"  Binding voivodeship: {binder['woj']}  (worst target {binder['dlbl'][0]} {binder['dlbl'][1]})")
-        print(f"    source feeder {binder['helikm']:.0f}km/{binder['feeder']*60:.0f}min | positioning {pos*VS:.0f}km/{pos*60:.0f}min (startup{'visible' if STARTUP+pos>binder['feeder'] else ' hidden'}) | rest of the flight {binder['dest']*60:.0f}min")
+        print(f"    source feeder {binder['helikm']:.0f}km/{binder['feeder']*60:.0f}min | positioning {pos*VS:.0f}km/{pos*60:.0f}min (activation{'+' if STARTUP+pos>binder['feeder'] else ' hidden'}) | rest of the flight {binder['dest']*60:.0f}min")

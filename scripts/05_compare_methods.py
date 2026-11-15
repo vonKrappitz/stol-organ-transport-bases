@@ -1,16 +1,15 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
 except NameError:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(_os.sys.argv[0])) or _os.getcwd()
-_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # reprodukcja_VI/
+_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # repository root
 _DANE_DIR   = _os.path.join(_REPRO_DIR, "data")
-RESULTS      = _os.path.join(_REPRO_DIR, "results")     # figury i CSV tu
+RESULTS      = _os.path.join(_REPRO_DIR, "results")     # output folder
 _os.makedirs(RESULTS, exist_ok=True)
-_os.chdir(_DANE_DIR)                                  # gole sciezki czytaja z dane/
-# end of path block
+_os.chdir(_DANE_DIR)                                  # bare paths read from data/
+# --- end of the path block ---
 
 import csv, re, json, math
 from itertools import combinations
@@ -35,19 +34,19 @@ with open("runways.csv",newline='',encoding="utf-8") as f:
         except: continue
         ap[a]["rwys"].append((ln,r["surface"]))
 
-# audited set (snapshot 2026-07-18): main conservative set of 33
+# --- audited main set of 33 airfields (conservative runway threshold) ---
 import csv as _csv
 _TROJKA=["EPBY","EPML","EPSY"]
 _CERT13=["EPWA","EPGD","EPKT","EPKK","EPLL","EPPO","EPRZ","EPSC","EPMO","EPWR","EPZG","EPLB","EPRA"]
-_ad4k=[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")) if r["prog_kons"]=="1"]
+_ad4k=[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"]=="1"]
 AUDYT33=sorted(set(_TROJKA+_CERT13+_ad4k))
 AF=[{"icao":d["icao"],"muni":d["muni"],"lat":d["lat"],"lon":d["lon"]} for a,d in ap.items() if d["icao"] in AUDYT33]
 _braki=set(AUDYT33)-{a["icao"] for a in AF}
-for _ic in _braki:  # np. EPBK bez pasa twardego w OurAirports, wspolrzedne z airports.csv
+for _ic in _braki:  # e.g. EPBK has no hard runway in OurAirports, so it is added by its coordinates
     for a,d in ap.items():
         if d["icao"]==_ic: AF.append({"icao":_ic,"muni":d["muni"],"lat":d["lat"],"lon":d["lon"]})
 assert len(AF)==len(AUDYT33),(len(AF),sorted(_braki))
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8")); CENT=g["cent"]; OSR=g["osr"]
+g=json.load(open("voivodeship_boundaries.json")); CENT=g["cent"]; OSR=g["osr"]
 WD={"dolnośląskie":(2879271,10.0,10.7,7.95,38,53),"kujawsko-pomorskie":(1996003,9.0,9.2,12.43,27,35),
 "lubelskie":(2011047,5.0,5.75,7.88,23,22),"lubuskie":(975023,12.0,17.94,14.25,9,21),
 "łódzkie":(2362519,4.0,5.36,7.55,15,22),"małopolskie":(3429632,7.0,10.56,11.08,46,54),
@@ -81,7 +80,6 @@ for k,(la,lo) in CENT.items():
         for c,v in cl.items():
             ci,cd=cair[c]
             term=hav(AF[i]["lat"],AF[i]["lon"],AF[ci]["lat"],AF[ci]["lon"])/VS+cd/VH
-            tr=hav(AF[i]["lat"],AF[i]["lon"],AF[ci]["lat"],AF[ci]["lon"])/VS
             if term>dworst:dworst=term
             dsum+=v*term
     src.append({"woj":k,"ai":i,"heli":d/VH,"dworst":dworst,"davg":dsum/TOTV,"w":wgt(k)})
@@ -109,13 +107,7 @@ def o_pmedU(t):
     for si,sc in enumerate(src):
         pos=min(D[si][b] for b in t)/VS; s+=max(sc["heli"],ST+pos)+sc["davg"]
     return s
-def o_stol(t):  # STOL only: positioning + worst transport, no helicopter
-    mx=0
-    for si,sc in enumerate(src):
-        pos=min(D[si][b] for b in t)/VS
-        mx=max(mx,pos+ (sc["dworst"]-sc.get("_h",0)))  # dworst zawiera heli_C; przybliz transport=dworst (heli_C maly)
-    return mx
-def cover(tri,T):  # udzial wazony popytem z najgorszym <= T (min)
+def cover(tri,T):  # demand-weighted share of sources whose worst case is at most T minutes
     c=0
     for si,s in enumerate(src):
         pos=min(D[si][b] for b in tri)/VS
@@ -138,7 +130,28 @@ tri=res["Minimax (worst case)"]
 b=max(src,key=lambda s:max(s["heli"],ST+min(D[src.index(s)][x] for x in tri)/VS)+s["dworst"])
 print(" ",b["woj"],f"{(max(b['heli'],ST+min(D[src.index(b)][x] for x in tri)/VS)+b['dworst'])*60:.0f} min")
 
-# save results in machine-readable form
+# --- variant without the conditional EPPI ---
+# Pila enters the coverage optimum and is registered as a landing site, so the
+# paper reports the result without it (Section 4.4). The search skips triples
+# with EPPI. That equals removing the airfield from the set as long as no
+# source or centre transfers at Pila, which the assertion guards.
+_ip=[n for n,a in enumerate(AF) if a["icao"]=="EPPI"][0]
+assert all(s["ai"]!=_ip for s in src) and all(v[0]!=_ip for v in cair.values()), "EPPI is a transfer airfield, the variant must be computed on a rebuilt set"
+def search_bez(obj,p=3):
+    best=9e9;bt=None
+    for tri in combinations([n for n in range(len(AF)) if n!=_ip],p):
+        v=obj(tri)
+        if v<best:best=v;bt=tri
+    return bt
+res_bez={nm:search_bez(ob) for nm,ob in names}
+print("\nWithout the conditional EPPI:")
+for nm,tri in res_bez.items():
+    wo,wa=metrics(tri); cv=cover(tri,135)
+    print(f"{nm:26} | {', '.join(AF[b]['icao'] for b in tri):16} | {wo*60:5.0f}m | {wa*60:5.0f}m | {cv*100:5.0f}%")
+
+# --- machine-readable results ---
+# The block below computes nothing new. It calls the same functions as the
+# printing loop, so the saved numbers equal the printed ones.
 _out = {}
 for _nm, _tri in res.items():
     _wo, _wa = metrics(_tri)
@@ -150,6 +163,17 @@ for _nm, _tri in res.items():
         "weighted_mean_min": round(_wa * 60, 1),
         "coverage_135_pct": round(_cv * 100, 1),
     }
+_bez = {}
+for _nm, _tri in res_bez.items():
+    _wo, _wa = metrics(_tri)
+    _bez[_nm] = {
+        "bases_icao": [AF[b]["icao"] for b in _tri],
+        "bases_cities": [AF[b]["muni"] for b in _tri],
+        "worst_min": round(_wo * 60, 1),
+        "weighted_mean_min": round(_wa * 60, 1),
+        "coverage_135_pct": round(cover(_tri, 135) * 100, 1),
+    }
+_out["without_EPPI"] = _bez
 with open(_os.path.join(RESULTS, "compare_methods.json"), "w", encoding="utf-8") as _f:
     json.dump(_out, _f, ensure_ascii=False, indent=2)
-print(f"\n  saved results/compare_methods.json ({len(_out)} methods)")
+print(f"\n  saved results/compare_methods.json ({len(res)} methods and the variant without EPPI)")

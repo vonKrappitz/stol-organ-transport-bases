@@ -1,30 +1,28 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
 except NameError:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(_os.sys.argv[0])) or _os.getcwd()
-_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # reprodukcja_VI/
+_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # repository root
 _DANE_DIR   = _os.path.join(_REPRO_DIR, "data")
-RESULTS      = _os.path.join(_REPRO_DIR, "results")     # figury i CSV tu
+RESULTS      = _os.path.join(_REPRO_DIR, "results")     # output folder
 _os.makedirs(RESULTS, exist_ok=True)
-_os.chdir(_DANE_DIR)                                  # gole sciezki czytaja z dane/
-# end of path block
+_os.chdir(_DANE_DIR)                                  # bare paths read from data/
+# --- end of the path block ---
 
-# -*- coding: utf-8 -*-
-# minimax p-center on the audited set (snapshot 2026-07-18)
+# minimax p-centre on the audited airfield sets
 import csv, json, math
 from itertools import combinations
 
 TROJKA=["EPBY","EPML","EPSY"]
 CERT13=["EPWA","EPGD","EPKT","EPKK","EPLL","EPPO","EPRZ","EPSC","EPMO","EPWR","EPZG","EPLB","EPRA"]
-CERT_H24=["EPWA","EPGD","EPKT","EPKK","EPRZ","EPMO","EPWR"]  # bez EPPO (okna wojskowe)
+CERT_H24=["EPWA","EPGD","EPKT","EPKK","EPRZ","EPMO","EPWR"]  # without EPPO (military operating windows)
 ad4b=[]; ad4k=[]
-for r in csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")):
+for r in csv.DictReader(open("airfield_audit_thresholds.csv")):
     if r["prog_baza"]=="1": ad4b.append(r["icao"])
     if r["prog_kons"]=="1": ad4k.append(r["icao"])
-MIL=[r["icao"] for r in csv.DictReader(open("airfield_audit_military.csv", encoding="utf-8")) if r["prog_baza"]=="1"]
+MIL=[r["icao"] for r in csv.DictReader(open("airfield_audit_military.csv")) if r["prog_baza"]=="1"]
 
 coords={}
 for r in csv.DictReader(open("airports.csv",encoding="utf-8")):
@@ -40,7 +38,7 @@ def zbior(icaos):
     if brak: print("  ! missing coordinates:",brak)
     return out
 
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8")); CENT=g["cent"]; OSR=g["osr"]
+g=json.load(open("voivodeship_boundaries.json")); CENT=g["cent"]; OSR=g["osr"]
 WD={"dolnośląskie":(2879271,10.0,10.7,7.95,38,53),"kujawsko-pomorskie":(1996003,9.0,9.2,12.43,27,35),
 "lubelskie":(2011047,5.0,5.75,7.88,23,22),"lubuskie":(975023,12.0,17.94,14.25,9,21),
 "łódzkie":(2362519,4.0,5.36,7.55,15,22),"małopolskie":(3429632,7.0,10.56,11.08,46,54),
@@ -93,7 +91,12 @@ def run(nazwa,AF,ps=(2,3,4)):
         bz=", ".join(f"{AF[b]['icao']}({AF[b]['muni'][:12]})" for b in bt)
         wi=max(range(len(src)),key=lambda si:max(src[si]["heli"],STARTUP+min(D[si][b] for b in bt)/VS)+src[si]["dest"])
         print(f"  p={p}: {best*60:6.1f} min | bases: {bz} | binds: {src[wi]['woj']} ({src[wi]['dlbl'][0]} {src[wi]['dlbl'][1]})")
-        wyn[p]=(best*60,bz)
+        # breakdown of the binding mission: source feeder, activation, positioning, onward flight with target feeder
+        pk=min(D[wi][b] for b in bt)
+        wz={"source":src[wi]["woj"],"organ":src[wi]["dlbl"][0],"centre":src[wi]["dlbl"][1],
+            "feeder_km":round(src[wi]["heli"]*VH,1),"feeder_min":round(src[wi]["heli"]*60,1),
+            "positioning_km":round(pk,1),"positioning_min":round(pk/VS*60,1),"activation_min":round(STARTUP*60,1),"onward_min":round(src[wi]["dest"]*60,1)}
+        wyn[p]=(best*60,bz,wz)
     return wyn
 
 S={}
@@ -104,19 +107,29 @@ S["S2 conservative (triple+13cert+AD4 cons)"]=zbior(sorted(set(TROJKA+CERT13+ad4
 # from an external base, no Jet A-1, no night in the eAIP). The supplementary
 # material reports this variant, so the script must compute it.
 S["S1b base set without conditional EPPI"]=zbior(sorted(set(TROJKA+CERT13+ad4b)-{"EPPI"}))
+# S2b: main set without EPPI. Pila enters the four-base optimum and is
+# registered as a landing site, so the paper reports the result without it
+# (Section 4.4).
+S["S2b conservative without conditional EPPI"]=zbior(sorted(set(TROJKA+CERT13+ad4k)-{"EPPI"}))
 S["S3 night H24 (7 cert H24)"]=zbior(CERT_H24)
 S["S4 civil+MIL (S1+14 military)"]=zbior(sorted(set(TROJKA+CERT13+ad4b+MIL)))
 wyniki={n:run(n,af) for n,af in S.items()}
-print("\n===== SUMMARY p=3 (reference: 143.0 min on the old set of 51) =====")
+print("\n===== SUMMARY p=3 =====")
 for n,w in wyniki.items():
     print(f"  {n:48} {w[3][0]:6.1f} min")
 
-# save results in machine-readable form
+# --- machine-readable results ---
+# The variable 'wyniki' already holds everything run() computed and printed.
+# The block below only writes it to a file.
 _a = {}
 for _n, _w in wyniki.items():
     _a[_n] = {"airfields": len(S[_n]),
               "p": {str(_p): {"worst_min": round(_v, 1), "bases": _bz}
-                    for _p, (_v, _bz) in _w.items()}}
+                    for _p, (_v, _bz, _wz) in _w.items()}}
+    # Section 3.3 of the manuscript cites the breakdown of the binding mission
+    # of the main model, so only that scenario carries it.
+    if len(S[_n]) == 33:
+        _a[_n]["p"]["3"]["binding"] = _w[3][2]
 with open(_os.path.join(RESULTS, "minimax_audit.json"), "w", encoding="utf-8") as _f:
     json.dump(_a, _f, ensure_ascii=False, indent=2)
 print(f"  saved results/minimax_audit.json ({len(_a)} scenarios)")

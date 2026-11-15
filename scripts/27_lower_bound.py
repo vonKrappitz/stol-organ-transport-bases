@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
 """
 27_lower_bound.py
 
-LOWER BOUND ON THE WORST-CASE MISSION TIME, independent of base placement.
-
-Computes the minimum over all feasible source-destination pairs of the
-time that no network of bases, of any cardinality, can go below.
-Shows that three bases leave only a small gap to this bound, i.e. most
-of the worst-case time is a property of geography, not of the network.
+Lower bound on the worst mission time, independent of the base placement.
+The first part repeats the data block of script 23.
 """
-# paths relative to the repository root
+# --- paths relative to the repository ---
 import os as _os
 try:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -21,14 +16,14 @@ _DANE_DIR = _os.path.join(_REPO_DIR, "data")
 RESULTS = _os.path.join(_REPO_DIR, "results")
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DANE_DIR)
-# end of path block
+# --- end of the path block ---
 
 import csv, re, json, math
 from itertools import combinations
 import numpy as np
 from scipy.optimize import linprog
 
-# ---------- data: identical to 05_compare_methods.py ----------
+# ---------- data: as in 05_compare_methods ----------
 keep = {"small_airport", "medium_airport", "large_airport"}
 ap = {}
 with open("airports.csv", newline='', encoding="utf-8") as f:
@@ -40,7 +35,7 @@ with open("airports.csv", newline='', encoding="utf-8") as f:
 
 _TROJKA = ["EPBY", "EPML", "EPSY"]
 _CERT13 = ["EPWA", "EPGD", "EPKT", "EPKK", "EPLL", "EPPO", "EPRZ", "EPSC", "EPMO", "EPWR", "EPZG", "EPLB", "EPRA"]
-_ad4k = [r["icao"] for r in csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")) if r["prog_kons"] == "1"]
+_ad4k = [r["icao"] for r in csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"] == "1"]
 AUDYT33 = sorted(set(_TROJKA + _CERT13 + _ad4k))
 AF = [{"icao": d["icao"], "muni": d["muni"], "lat": d["lat"], "lon": d["lon"]}
       for a, d in ap.items() if d["icao"] in AUDYT33]
@@ -50,7 +45,7 @@ for _ic in set(AUDYT33) - {a["icao"] for a in AF}:
             AF.append({"icao": _ic, "muni": d["muni"], "lat": d["lat"], "lon": d["lon"]})
 assert len(AF) == 33, len(AF)
 
-g = json.load(open("voivodeship_boundaries.json", encoding="utf-8")); CENT = g["cent"]; OSR = g["osr"]
+g = json.load(open("voivodeship_boundaries.json")); CENT = g["cent"]; OSR = g["osr"]
 WD = {"dolnośląskie": (2879271, 10.0, 10.7, 7.95, 38, 53), "kujawsko-pomorskie": (1996003, 9.0, 9.2, 12.43, 27, 35),
       "lubelskie": (2011047, 5.0, 5.75, 7.88, 23, 22), "lubuskie": (975023, 12.0, 17.94, 14.25, 9, 21),
       "łódzkie": (2362519, 4.0, 5.36, 7.55, 15, 22), "małopolskie": (3429632, 7.0, 10.56, 11.08, 46, 54),
@@ -82,17 +77,17 @@ WOJ = list(CENT.keys())
 sair = {k: near(la, lo) for k, (la, lo) in CENT.items()}
 
 # ---------- margins ----------
-# d_i : donor count of the voivodeship (mean 2020-2024)
+# d_i : donors of the voivodeship (mean 2020-2024)
 D = np.array([wgt(k) for k in WOJ])
 # r_k^o : transplant volume of centre k for organ o
 ORG = list(VOL.keys())
-# donors are split across organs proportionally to the organ share,
-# so that row and column sums close in every Frechet set
+# donors are split between organs in proportion to the organ's share, so that
+# row and column sums balance in every Frechet set
 Rtot = {o: sum(VOL[o].values()) for o in ORG}
 TOT = sum(Rtot.values())
 
 print("=" * 78)
-print("MARGINS (observed)")
+print("MARGINS")
 print("=" * 78)
 print(f"  sources: {len(WOJ)} voivodeships, donors in total {D.sum():.1f}/year")
 for o in ORG:
@@ -101,7 +96,7 @@ print(f"  total volume {TOT}")
 
 # ---------- times ----------
 # A_i(x) = max(feeder_i, ST + positioning_i(x))   [depends on x, not on k,o]
-# B_ik   = flight(a(i)->c(k)) + feeder_k            [depends on (i,k), not on x]
+# B_ik   = flight(a(i)->c(k)) + feeder_k           [depends on (i,k), not on x]
 feeder_src = np.array([sair[k][1] / VH for k in WOJ])
 Dist_base = np.array([[hav(AF[b]["lat"], AF[b]["lon"], AF[sair[k][0]]["lat"], AF[sair[k][0]]["lon"])
                        for b in range(len(AF))] for k in WOJ])
@@ -123,7 +118,7 @@ def A_of(tri):
 
 # ---------- Frechet set: bounds over the coupling ----------
 def frechet_extremum(Bo, d_o, r_o, sense):
-    """max lub min sum_ik q_ik B_ik po politopie transportowym."""
+    """Maximum or minimum of sum_ik q_ik B_ik over the transport polytope."""
     n, m = Bo.shape
     c = Bo.reshape(-1)
     if sense == "max": c = -c
@@ -140,10 +135,18 @@ def frechet_extremum(Bo, d_o, r_o, sense):
     return (-res.fun if sense == "max" else res.fun)
 
 
-
 # =====================================================================
 # LOWER BOUND ON THE WORST TIME
 # =====================================================================
+# The paper states that geography, not the base network, binds the worst case.
+# Here the statement becomes a number.
+#
+# Reasoning. The mission time has the form max(feeder_i, activation + positioning) + B.
+# Positioning is non-negative and vanishes when a base stands on the source airfield, so
+# for ANY placement and ANY number of bases
+#     worst time >= max over (i,k,o) of [max(feeder_i, activation) + B_iko].
+# The right-hand side does not depend on x, so it is a bound no network can beat.
+
 naj = 0.0
 opis = None
 for si, w in enumerate(WOJ):
@@ -157,18 +160,23 @@ print()
 print("=" * 78)
 print("LOWER BOUND ON THE WORST TIME, independent of base placement")
 print("=" * 78)
-print(f"  lower bound:  {naj*60:6.1f} min")
+print(f"  bound:        {naj*60:6.1f} min")
 print(f"  binds:        {opis[0]} -> {opis[1]} ({opis[2]})")
+# The optimum of 143.5 min is typed in. This check keeps it equal to the result of script 19.
+_ma=_os.path.join(RESULTS,"minimax_audit.json")
+if _os.path.exists(_ma):
+    _p3=[v["p"]["3"]["worst_min"] for v in json.load(open(_ma,encoding="utf-8")).values() if v["airfields"]==33][0]
+    assert abs(_p3-143.5)<0.05, "143.5 differs from the result of script 19"
 print(f"  optimum p=3:   143.5 min")
-print(f"  gap:          {143.5 - naj*60:6.1f} min, i.e. {100*(143.5-naj*60)/143.5:.1f} percent of the result")
+print(f"  gap:          {143.5 - naj*60:6.1f} min, that is {100*(143.5-naj*60)/143.5:.1f} per cent of the result")
 print()
-print("  Interpretation. No network of bases, of any cardinality, can go below")
-print("  this bound. Three bases leave a gap of a dozen-odd minutes to it,")
-print("  so the dominant part of the worst-case time is a property of geography.")
+print("  Reading. No base network, of any size, can go below the bound.")
+print("  Three bases leave a gap to it of a dozen or so minutes,")
+print("  so most of the worst time is a property of geography.")
 
 import json as _json
 with open(_os.path.join(RESULTS, "lower_bound.json"), "w", encoding="utf-8") as f:
-    _json.dump({"lower_bound_min": round(naj*60, 1), "binds": list(opis),
-                "optimum_p3_min": 143.5, "gap_min": round(143.5 - naj*60, 1)},
+    _json.dump({"ograniczenie_min": round(naj*60, 1), "binds": list(opis),
+                "optimum_p3_min": 143.5, "luka_min": round(143.5 - naj*60, 1)},
                f, ensure_ascii=False, indent=1)
 print(f"\n  saved {_os.path.join(RESULTS, 'lower_bound.json')}")

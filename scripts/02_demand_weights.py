@@ -1,4 +1,3 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
 # Donor counts from the Poltransplant report on procurement and transplantation, Table 5
 # pop = residents at the end of 2023. For 2020-2022 the source gives donors per million,
 # so the count is reconstructed as pmp*pop/1e6. For 2023 and 2024 the count is given directly.

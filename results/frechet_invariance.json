@@ -1,21 +1,32 @@
 {
- "bases_robust": [
+ "bazy_dro": [
   "EPBC",
   "EPKM",
   "EPPO"
  ],
- "bases_independence": [
+ "bazy_niezaleznosc": [
   "EPBC",
   "EPKM",
   "EPPO"
  ],
- "bases_optimistic": [
+ "bazy_optymistyczne": [
   "EPBC",
   "EPKM",
   "EPPO"
  ],
  "min_min_min": 45.044583536744355,
  "min_max_min": 89.05278464368249,
- "independence_min": 71.06865438845857,
- "invariance": true
+ "niezaleznosc_min": 71.06865438845857,
+ "invariance": true,
+ "minimax_triple": {
+  "bases": [
+   "EPBK",
+   "EPBY",
+   "EPML"
+  ],
+  "lower_bound_min": 54.556545499295844,
+  "upper_bound_min": 98.56474660623397,
+  "independence_min": 80.58061635101005,
+  "width_min": 44.008201106938124
+ }
 }

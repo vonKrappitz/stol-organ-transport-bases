@@ -1,5 +1,4 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SCRIPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -10,7 +9,7 @@ _DATA_DIR   = _os.path.join(_REPO_DIR, "data")
 RESULTS      = _os.path.join(_REPO_DIR, "results")     # figures and CSV go here
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DATA_DIR)                                  # bare paths read from data/
-# end of path block
+# --- end of the path block ---
 
 import csv, re
 WOJ={"PL-DS":"dolnośląskie","PL-KP":"kuj-pom","PL-LU":"lubelskie","PL-LB":"lubuskie",

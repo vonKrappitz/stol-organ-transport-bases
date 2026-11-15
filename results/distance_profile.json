@@ -1,39 +1,39 @@
 {
-  "bands": [
+  "pasma": [
     {
-      "band_km": "0–100",
-      "disclosed": 164,
-      "estimated": 10,
-      "total": 174
+      "pasmo_km": "0–100",
+      "ujawnione": 164,
+      "doszacowane": 10,
+      "razem": 174
     },
     {
-      "band_km": "100–200",
-      "disclosed": 5129,
-      "estimated": 320,
-      "total": 5449
+      "pasmo_km": "100–200",
+      "ujawnione": 5129,
+      "doszacowane": 320,
+      "razem": 5449
     },
     {
-      "band_km": "200–300",
-      "disclosed": 30,
-      "estimated": 182,
-      "total": 212
+      "pasmo_km": "200–300",
+      "ujawnione": 30,
+      "doszacowane": 182,
+      "razem": 212
     },
     {
-      "band_km": "300–400",
-      "disclosed": 0,
-      "estimated": 96,
-      "total": 96
+      "pasmo_km": "300–400",
+      "ujawnione": 0,
+      "doszacowane": 96,
+      "razem": 96
     },
     {
-      "band_km": "400+",
-      "disclosed": 0,
-      "estimated": 60,
-      "total": 60
+      "pasmo_km": "400+",
+      "ujawnione": 0,
+      "doszacowane": 60,
+      "razem": 60
     }
   ],
-  "total_procedures": 5991,
-  "share_below_200km_pct": 93.86,
-  "share_band_100_200_pct": 90.95,
-  "disclosed_above_300km": 0,
-  "estimated_above_300km": 156
+  "suma_swiadczen": 5991,
+  "udzial_ponizej_200km_proc": 93.86,
+  "udzial_pasma_100_200_proc": 90.95,
+  "ujawnionych_powyzej_300km": 0,
+  "doszacowanych_powyzej_300km": 156
 }

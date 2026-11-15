@@ -16,14 +16,10 @@ BASELINE VALIDATION: 143.5 min, bases ('EPBK', 'EPBY', 'EPML'), |AF|=33
   VH=276 VS=380                 125.3 min  = baseline EPBK,EPBY,EPML  
   --> base triple unchanged in 9/9 speed combinations
 
-########## B. SENSITIVITY TO RUNWAY THRESHOLD (baseline 750 m) ##########
+########## B. SENSITIVITY TO THE AIRFIELD SET (the two audited sets) ##########
   setting                   result     status  bases
-  threshold=700 m  (|AF|=40)    134.7 min  CHANGED EPBK,EPPI,EPST  
-  threshold=750 m  (|AF|=40)    134.7 min  CHANGED EPBK,EPPI,EPST  
-  threshold=800 m  (|AF|=33)    143.5 min  = baseline EPBK,EPBY,EPML  
-  threshold=900 m  (|AF|=33)    143.5 min  = baseline EPBK,EPBY,EPML  
-  threshold=1000 m  (|AF|=33)   143.5 min  = baseline EPBK,EPBY,EPML  
-  --> base triple unchanged in 3/5 thresholds
+  main, 875 m hard and 1050 m grass (|AF|=33)  143.5 min  = baseline EPBK,EPBY,EPML  
+  extended, 758 m hard and 890 m grass (|AF|=40)  134.7 min  CHANGED EPBK,EPPI,EPST  
 
 ########## C. SENSITIVITY TO THE SOURCE SET ##########
   setting                   result     status  bases
@@ -32,7 +28,7 @@ BASELINE VALIDATION: 143.5 min, bases ('EPBK', 'EPBY', 'EPML'), |AF|=33
   33 airfields, fully demand-free  155.2 min  CHANGED EPBC,EPBY,EPRJ  
 
 ########## STABILITY SUMMARY ##########
-  Speed and threshold perturbations in total: 14
-  Triple Bialystok, Bydgoszcz, Mielec retained: 12/14
-  Worst time across the speed grid: 125 do 168 min
+  Triple Bialystok, Bydgoszcz, Mielec retained across the speed grid: 9/9
+  Extended airfield set: triple changed
+  Worst time across the speed grid: 125 to 168 min
   saved results/sensitivity.json

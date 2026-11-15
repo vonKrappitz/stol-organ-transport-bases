@@ -1,0 +1,48 @@
+{
+  "STOL Caravan EX VFR": {
+    "airfields": 33,
+    "worst_min": 160.1,
+    "typical_min": 95.8,
+    "bases_icao": [
+      "EPBY",
+      "EPML",
+      "EPSU"
+    ],
+    "beyond_helicopter_reach": []
+  },
+  "STOL Caravan EX IFR": {
+    "airfields": 33,
+    "worst_min": 195.3,
+    "typical_min": 126.9,
+    "bases_icao": [
+      "EPBY",
+      "EPML",
+      "EPSU"
+    ],
+    "beyond_helicopter_reach": []
+  },
+  "Piaggio P180 IFR": {
+    "airfields": 22,
+    "worst_min": 122.3,
+    "typical_min": 87.8,
+    "bases_icao": [
+      "EPBY",
+      "EPML",
+      "EPSU"
+    ],
+    "beyond_helicopter_reach": []
+  },
+  "Learjet 45 IFR": {
+    "airfields": 17,
+    "worst_min": 111.5,
+    "typical_min": 83.8,
+    "bases_icao": [
+      "EPLB",
+      "EPML",
+      "EPPI"
+    ],
+    "beyond_helicopter_reach": [
+      "podlaskie"
+    ]
+  }
+}

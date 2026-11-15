@@ -1,0 +1,40 @@
+{
+  "threshold_135": {
+    "minimax_bases": {
+      "robust_pct": 91.1,
+      "pairs_pct": 99.4
+    },
+    "optimum": {
+      "robust_pct": 97.0,
+      "robust_bases": [
+        "EPKR",
+        "EPLB",
+        "EPPI"
+      ],
+      "pairs_pct": 99.5,
+      "pairs_bases": [
+        "EPBK",
+        "EPKR",
+        "EPPI"
+      ]
+    }
+  },
+  "by_threshold": {
+    "120": {
+      "robust_pct": 82.9,
+      "pairs_pct": 95.7
+    },
+    "135": {
+      "robust_pct": 97.0,
+      "pairs_pct": 99.5
+    },
+    "150": {
+      "robust_pct": 100.0,
+      "pairs_pct": 100.0
+    },
+    "180": {
+      "robust_pct": 100.0,
+      "pairs_pct": 100.0
+    }
+  }
+}

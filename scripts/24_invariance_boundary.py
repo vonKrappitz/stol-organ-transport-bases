@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
 """
 24_invariance_boundary.py
 
-BOUNDARY TEST OF THE INVARIANCE THEOREM.
+BOUNDARY TEST OF THE INVARIANCE PROPOSITION.
 
-In the main variant, the transfer airfield is always the nearest to the source,
-so time decomposes as T_ik(x) = A_i(x) + B_ik and location is invariant
+In the main variant the transfer airfield is always the one nearest the source,
+so the time splits as T_ik(x) = A_i(x) + B_ik and the location is invariant
 with respect to the coupling (script 23).
 
-Here we check the FREE CHOICE variant of the transfer airfield among all
-within range of one helicopter mission. Then the airfield choice depends
-SIMULTANEOUSLY on the base triple and on the destination, so the decomposition
-breaks. Question: does invariance fail with it, or only its proof?
+Here the transfer airfield is chosen FREELY among all airfields within one
+helicopter mission of the source. The choice then depends on the base triple
+and on the target at once, so the split breaks down. The question is whether
+invariance fails with it, or only its proof.
 """
-# paths relative to the repository root
+# --- paths ---
 import os as _os
 try:
     _SCRIPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -25,7 +24,7 @@ _DATA_DIR = _os.path.join(_REPO_DIR, "data")
 RESULTS = _os.path.join(_REPO_DIR, "results")
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DATA_DIR)
-# end of path block
+# --- end ---
 
 import csv, re, json, math, time
 from itertools import combinations
@@ -41,14 +40,14 @@ with open("airports.csv", newline='', encoding="utf-8") as f:
                           "lat": float(r["latitude_deg"]), "lon": float(r["longitude_deg"])}
 _TROJKA = ["EPBY", "EPML", "EPSY"]
 _CERT13 = ["EPWA", "EPGD", "EPKT", "EPKK", "EPLL", "EPPO", "EPRZ", "EPSC", "EPMO", "EPWR", "EPZG", "EPLB", "EPRA"]
-_ad4k = [r["icao"] for r in csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")) if r["prog_kons"] == "1"]
+_ad4k = [r["icao"] for r in csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"] == "1"]
 AUDYT33 = sorted(set(_TROJKA + _CERT13 + _ad4k))
 AF = [{"icao": d["icao"], "muni": d["muni"], "lat": d["lat"], "lon": d["lon"]} for a, d in ap.items() if d["icao"] in AUDYT33]
 for _ic in set(AUDYT33) - {a["icao"] for a in AF}:
     for a, d in ap.items():
         if d["icao"] == _ic: AF.append({"icao": _ic, "muni": d["muni"], "lat": d["lat"], "lon": d["lon"]})
 assert len(AF) == 33
-g = json.load(open("voivodeship_boundaries.json", encoding="utf-8")); CENT = g["cent"]; OSR = g["osr"]
+g = json.load(open("voivodeship_boundaries.json")); CENT = g["cent"]; OSR = g["osr"]
 WD = {"dolnośląskie": (2879271,10.0,10.7,7.95,38,53), "kujawsko-pomorskie": (1996003,9.0,9.2,12.43,27,35),
 "lubelskie": (2011047,5.0,5.75,7.88,23,22), "lubuskie": (975023,12.0,17.94,14.25,9,21),
 "łódzkie": (2362519,4.0,5.36,7.55,15,22), "małopolskie": (3429632,7.0,10.56,11.08,46,54),
@@ -78,7 +77,7 @@ WOJ=list(CENT.keys()); ORG=list(VOL.keys())
 D=np.array([wgt(k) for k in WOJ])
 Rtot={o:sum(VOL[o].values()) for o in ORG}; TOT=sum(Rtot.values())
 
-# helicopter range: airfields within HELI_RANGE of the source
+# helicopter reach: airfields within HELI_RANGE of each source
 reach={}; feed={}
 for ii,w in enumerate(WOJ):
     la,lo=CENT[w]; R=[];F=[]
@@ -97,7 +96,7 @@ for o in ORG:
 DB=np.array([[hav(AF[b]["lat"],AF[b]["lon"],AF[a]["lat"],AF[a]["lon"]) for a in range(len(AF))] for b in range(len(AF))])
 
 def T_free(tri):
-    """matrix czasow przy free wyborze airfields przesiadki"""
+    """Time matrix under free choice of the transfer airfield."""
     pos=DB[list(tri),:].min(axis=0)/VS
     out={}
     for o in ORG:
@@ -129,7 +128,7 @@ print("="*78)
 print("BOUNDARY TEST: variant FREE choice of transfer airfield")
 print("="*78)
 print(f"  airfields within reach of sources: min {min(len(v) for v in reach.values())}, "
-      f"mediana {int(np.median([len(v) for v in reach.values()]))}, maks {max(len(v) for v in reach.values())}")
+      f"median {int(np.median([len(v) for v in reach.values()]))}, max {max(len(v) for v in reach.values())}")
 
 best={"max":(9e9,None),"ind":(9e9,None),"min":(9e9,None)}
 t0=time.time()
@@ -155,12 +154,12 @@ for k,lab in [("max","min-max (robust)"),("ind","independence (proxy)"),("min","
 same = best["max"][1]==best["ind"][1]==best["min"][1]
 print()
 print("="*78)
-print(f"  INVARIANCE IN THE FREE CHOICE VARIANT: {same}")
+print(f"  INVARIANCE IN THE VARIANT free: {same}")
 print("="*78)
 if not same:
-    print("  Triples DIFFER -> the theorem has boundaries, the chain structure")
-    print("  condition is ESSENTIAL, not merely convenient for the proof.")
-    # how much worse is the robust triple on the proxy criterion?
+    print("  The triples DIFFER -> the proposition has a boundary, and the chain-structure condition")
+    print("  is ESSENTIAL, not merely convenient for the proof.")
+    # how much worse is the robust triple than the proxy triple under the proxy criterion?
     tri_ind=best["ind"][1]; tri_max=best["max"][1]
     T=T_free(tri_ind); v_ind_at_ind=0.0
     for o in ORG:
@@ -168,17 +167,18 @@ if not same:
     T=T_free(tri_max); v_ind_at_max=0.0
     for o in ORG:
         d_o,r_o=MARG[o]; q=np.outer(d_o,r_o)/r_o.sum(); v_ind_at_max+=float((q*T[o]).sum())
-    print(f"  cost of robustness: robust triple on proxy criterion {v_ind_at_max/TOT*60:.1f} min")
-    print(f"                    proxy triple on proxy criterion {v_ind_at_ind/TOT*60:.1f} min")
+    print(f"  cost of robustness: robust triple on criterion proxy {v_ind_at_max/TOT*60:.1f} min")
+    print(f"                    proxy triple   on criterion proxy {v_ind_at_ind/TOT*60:.1f} min")
     print(f"                    difference {abs(v_ind_at_max-v_ind_at_ind)/TOT*60:.2f} min")
 else:
-    print("  Triples ARE THE SAME -> invariance extends further than its proof,")
+    print("  The triples are THE SAME -> invariance reaches further than its proof,")
     print("  which is itself a result worth reporting.")
 
-out={"variant":"free choice airfields","invariance":bool(same),
-     "bases_max":[AF[b]["icao"] for b in best["max"][1]],
-     "bases_ind":[AF[b]["icao"] for b in best["ind"][1]],
-     "bases_min":[AF[b]["icao"] for b in best["min"][1]],
+_koszt=abs(v_ind_at_max-v_ind_at_ind)/TOT*60 if not same else 0.0
+out={"variant":"free choice airfields","invariance":bool(same),"robustness_cost_min":round(_koszt,2),
+     "bazy_max":[AF[b]["icao"] for b in best["max"][1]],
+     "bazy_ind":[AF[b]["icao"] for b in best["ind"][1]],
+     "bazy_min":[AF[b]["icao"] for b in best["min"][1]],
      "min_max_min":best["max"][0]*60,"ind_min":best["ind"][0]*60,"min_min_min":best["min"][0]*60}
 with open(_os.path.join(RESULTS,"invariance_boundary.json"),"w",encoding="utf-8") as f:
     json.dump(out,f,ensure_ascii=False,indent=1)

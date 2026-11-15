@@ -1,5 +1,4 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SCRIPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -10,7 +9,7 @@ _DATA_DIR   = _os.path.join(_REPO_DIR, "data")
 RESULTS      = _os.path.join(_REPO_DIR, "results")     # figures and CSV go here
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DATA_DIR)                                  # bare paths read from data/
-# end of path block
+# --- end of the path block ---
 
 import csv, re, json, math
 from itertools import combinations
@@ -35,7 +34,7 @@ for r in csv.DictReader(open("runways.csv",newline='',encoding="utf-8")):
 import csv as _csv
 _TROJKA=["EPBY","EPML","EPSY"]
 _CERT13=["EPWA","EPGD","EPKT","EPKK","EPLL","EPPO","EPRZ","EPSC","EPMO","EPWR","EPZG","EPLB","EPRA"]
-AUDYT33=sorted(set(_TROJKA+_CERT13+[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")) if r["prog_kons"]=="1"]))
+AUDYT33=sorted(set(_TROJKA+_CERT13+[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"]=="1"]))
 def _audyt_af_dict(ap,hd):
     def _ic(a,d): return d.get("icao") or a
     AF={_ic(a,d):d for a,d in ap.items() if _ic(a,d) in AUDYT33}
@@ -44,7 +43,7 @@ def _audyt_af_dict(ap,hd):
             if _ic(a,d)==_m: AF[_m]=d
     return AF
 AF=[{"muni":d["muni"],"lat":d["lat"],"lon":d["lon"]} for d in _audyt_af_dict(ap,hd).values()]
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8")); OSR=g["osr"]; CENT=g["cent"]
+g=json.load(open("voivodeship_boundaries.json")); OSR=g["osr"]; CENT=g["cent"]
 WD={"dolnośląskie":(2879271,10.0,10.7,7.95,38,53),"kujawsko-pomorskie":(1996003,9.0,9.2,12.43,27,35),"lubelskie":(2011047,5.0,5.75,7.88,23,22),"lubuskie":(975023,12.0,17.94,14.25,9,21),"łódzkie":(2362519,4.0,5.36,7.55,15,22),"małopolskie":(3429632,7.0,10.56,11.08,46,54),"mazowieckie":(5510527,9.0,8.67,10.16,85,101),"opolskie":(936725,10.0,11.30,11.64,11,13),"podkarpackie":(2071676,4.0,2.84,4.80,13,16),"podlaskie":(1138216,7.0,4.28,15.71,16,27),"pomorskie":(2359573,20.0,23.87,21.62,67,55),"śląskie":(4320130,13.0,13.64,15.83,73,83),"świętokrzyskie":(1168499,4.0,5.75,5.92,23,30),"warmińsko-mazurskie":(1357910,19.0,14.89,10.95,23,27),"wielkopolskie":(3487973,15.0,11.17,15.16,57,67),"zachodniopomorskie":(1631784,13.0,8.32,12.77,40,41)}
 def wS(k):
     p,a,b,c,d,e=WD[k];return (a*p/1e6+b*p/1e6+c*p/1e6+d+e)/5
@@ -62,10 +61,10 @@ def near(la,lo):
 cair={c:near(la,lo) for c,(la,lo) in OSR.items()}
 sair={k:near(la,lo) for k,(la,lo) in CENT.items()}
 VS,ROUTE,TERM,ST=330.0,1.05,5/60,5/60
-VHELI=240.0; ROAD,VAMB=1.35,75.0   # GEMS: droga x1.35, karetka 75 km/h
+VHELI=240.0; ROAD,VAMB=1.35,75.0   # GEMS: road distance x1.35, ambulance at 75 km/h
 def feeder(km,mode): return km/VHELI if mode=="feeder" else km*ROAD/VAMB
 def stolleg(km): return km*ROUTE/VS+TERM
-# minimax + weighted mean per configuration (omode, dmode)
+# minimax and typical time for a configuration (source mode, destination mode)
 def run(om,dm,label):
     D=[[hav(AF[b]["lat"],AF[b]["lon"],AF[sair[k][0]]["lat"],AF[sair[k][0]]["lon"]) for b in range(len(AF))] for k in CENT]
     src=[]
@@ -94,12 +93,35 @@ def run(om,dm,label):
         wa+=x["w"]*(max(x["of"],ST+pos)+x["davg"])
     wa/=W
     fit="yes" if best*60<=240 else "NO (>4h)"
-    print(f"{label:16} | worst {best*60:3.0f} min | w.mean {wa*60:3.0f} min | binds {s['woj']}->{s['dl'][1]} (source feeder {s['odkm']:.0f}km) | heart window {fit}")
+    # worst heart mission for the same triple: the overall worst case can bind
+    # a centre without a heart programme, so the heart is reported separately
+    hs=0;hl=None
+    for si,(k,(la,lo)) in enumerate(CENT.items()):
+        i,od=sair[k]
+        pos=stolleg(min(D[si][b] for b in bt)) if min(D[si][b] for b in bt)>0.1 else 0
+        for c in VOL["heart"]:
+            ci,cd=cair[c]
+            t=max(feeder(od,om),ST+pos)+stolleg(hav(AF[i]["lat"],AF[i]["lon"],AF[ci]["lat"],AF[ci]["lon"]))+feeder(cd,dm)
+            if t>hs:hs=t;hl=(k,c)
+    print(f"{label:16} | worst {best*60:3.0f} min | typ {wa*60:3.0f} min | binds {s['woj']}->{s['dl'][1]} (source feeder {s['odkm']:.0f}km) | below 4 h {fit} | worst heart {hs*60:3.0f} min ({hl[0]}->{hl[1]})")
+    # cross-clamp to arrival for the worst heart mission: two handovers and
+    # the assumed donor-side phase, as in script 09
+    hz=[round(hs*60+PRZEKAZANIA+f,1) for f in FAZA_DAWCY]
+    WYN[label]={"najgorszy_min":round(best*60,1),"typowy_min":round(wa*60,1),
+                "wiaze":f"{s['woj']}->{s['dl'][1]}","dowoz_zrodla_km":round(s['odkm'],1),
+                "serce_najgorszy_min":round(hs*60,1),"serce_wiaze":f"{hl[0]}->{hl[1]}",
+                "serce_od_zacisku_do_przylotu_min":hz}
     return best*60,wa*60
-print("HEMS helicopter 240 km/h. GEMS ambulance road x1.35, 75 km/h. Centre STOL 330 km/h.\n")
-print(f"{'Configuration':16} | {'worst':9} | {'w.mean':6} | binding case | heart-window fit")
+WYN={}
+PRZEKAZANIA=30          # two handovers of 15 min
+FAZA_DAWCY=(30,60)      # assumed procurement and packing phase, min
+print("HEMS helicopter 240 km/h. GEMS ambulance by road x1.35, 75 km/h. STOL 330 km/h.\n")
+print(f"{'Configuration':16} | {'worst':9} | {'typical':6} | binding case | below 4 h | worst heart mission")
 print("-"*128)
 run("feeder","feeder","HEMS-STOL-HEMS")
 run("gems","feeder","GEMS-STOL-HEMS")
 run("feeder","gems","HEMS-STOL-GEMS")
 run("gems","gems","GEMS-STOL-GEMS")
+with open(_os.path.join(RESULTS,"feeder_configurations.json"),"w",encoding="utf-8") as f:
+    json.dump(WYN,f,ensure_ascii=False,indent=1)
+print(f"\nsaved {_os.path.join(RESULTS,'feeder_configurations.json')}")

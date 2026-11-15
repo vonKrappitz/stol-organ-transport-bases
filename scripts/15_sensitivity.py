@@ -1,18 +1,17 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
 except NameError:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(_os.sys.argv[0])) or _os.getcwd()
-_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # reprodukcja_VI/
+_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # repository root
 _DANE_DIR   = _os.path.join(_REPRO_DIR, "data")
-RESULTS      = _os.path.join(_REPRO_DIR, "results")     # figury i CSV tu
+RESULTS      = _os.path.join(_REPRO_DIR, "results")     # output folder
 _os.makedirs(RESULTS, exist_ok=True)
-_os.chdir(_DANE_DIR)                                  # gole sciezki czytaja z dane/
-# end of path block
+_os.chdir(_DANE_DIR)                                  # bare paths read from data/
+# --- end of the path block ---
 
-# --- save the result to a file so it is reproducible, not copied by hand ---
+# --- the printout is also saved to a file ---
 import io as _io, sys as _sys
 _bufor = _io.StringIO()
 class _Tee:
@@ -30,13 +29,13 @@ def _zapisz():
         f.write(_bufor.getvalue())
     print(f"  saved {_os.path.join(RESULTS, 'sensitivity_result.txt')}")
 _atexit.register(_zapisz)
-# end of save block
+# --- end of the saving block ---
 
 
 import csv, re, json, math
 from itertools import combinations
 
-# ---------- load airfields and runways (as in 04_minimax.py) ----------
+# ---------- airfields and runways (as in 04_minimax.py) ----------
 keep={"small_airport","medium_airport","large_airport"}
 ap={}
 with open("airports.csv",newline='',encoding="utf-8") as f:
@@ -61,12 +60,12 @@ with open("runways.csv",newline='',encoding="utf-8") as f:
 import csv as _csv
 _TROJKA=["EPBY","EPML","EPSY"]
 _CERT13=["EPWA","EPGD","EPKT","EPKK","EPLL","EPPO","EPRZ","EPSC","EPMO","EPWR","EPZG","EPLB","EPRA"]
-_ad4rows={r["icao"]:r for r in _csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8"))}
+_ad4rows={r["icao"]:r for r in _csv.DictReader(open("airfield_audit_thresholds.csv"))}
 AUDYT33=sorted(set(_TROJKA+_CERT13+[ic for ic,r in _ad4rows.items() if r["prog_kons"]=="1"]))
 AUDYT40=sorted(set(_TROJKA+_CERT13+[ic for ic,r in _ad4rows.items() if r["prog_baza"]=="1"]))
-def build_AF(thr_m):
-    # audit thresholds: thr_m<=758 -> base set of 40; otherwise main set of 33
-    chc=AUDYT40 if thr_m<=758 else AUDYT33
+def build_AF(zbior):
+    # the audit gives two sets: "main" (conservative threshold, 33 airfields) and "extended" (base threshold, 40)
+    chc={"main":AUDYT33,"extended":AUDYT40}[zbior]
     AF=[]; seen=set()
     for a,d in ap.items():
         if d["icao"] in chc and d["icao"] not in seen:
@@ -77,7 +76,7 @@ def build_AF(thr_m):
                 AF.append({"icao":ic,"muni":d["muni"],"lat":d["lat"],"lon":d["lon"]}); break
     return AF
 
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8")); CENT=g["cent"]; OSR=g["osr"]
+g=json.load(open("voivodeship_boundaries.json")); CENT=g["cent"]; OSR=g["osr"]
 
 def hav(lat1,lon1,lat2,lon2):
     R=6371.0; p1,p2=math.radians(lat1),math.radians(lat2)
@@ -96,13 +95,13 @@ def nearest(AF,lat,lon):
         if d<bd: bd=d;best=i
     return best,bd
 
-def solve(VH=240.0,VS=330.0,STARTUP=5/60,thr_m=875.0,src_mode="centroids",p=3):
-    AF=build_AF(thr_m)
-    # destinations -> nearest airfield + helicopter feeder leg
+def solve(VH=240.0,VS=330.0,STARTUP=5/60,zbior="main",src_mode="centroids",p=3):
+    AF=build_AF(zbior)
+    # targets: nearest airfield and the centre feeder
     cair={}
     for c,(la,lo) in OSR.items():
         i,d=nearest(AF,la,lo); cair[c]=(i,d)
-    # zbuduj zrodla wedlug trybu
+    # build the sources by mode
     src=[]
     if src_mode=="centroids":
         pts=[(k,la,lo) for k,(la,lo) in CENT.items()]
@@ -112,8 +111,8 @@ def solve(VH=240.0,VS=330.0,STARTUP=5/60,thr_m=875.0,src_mode="centroids",p=3):
         pts=[(a["icao"],a["lat"],a["lon"]) for a in AF]
     for k,la,lo in pts:
         if src_mode=="airports":
-            # the source lies on an airfield: helicopter feeder leg = 0, source airfield = that airfield
-            ai,helikm=nearest(AF,la,lo)  # zwroci to samo lotnisko, d~0
+            # the source lies on an airfield, so the source feeder is zero
+            ai,helikm=nearest(AF,la,lo)  # returns the same airfield, d close to 0
         else:
             ai,helikm=nearest(AF,la,lo)
         worst=0
@@ -136,11 +135,11 @@ def solve(VH=240.0,VS=330.0,STARTUP=5/60,thr_m=875.0,src_mode="centroids",p=3):
     bases=tuple(sorted(AF[b]["icao"] for b in bestT))
     return best*60, bases, len(AF)
 
-# ---------- WALIDACJA: baza ----------
+# ---------- VALIDATION: baseline ----------
 v,b,n=solve()
 print(f"BASELINE VALIDATION: {v:.1f} min, bases {b}, |AF|={n}")
 print(f"  expected: 143.5 min, ('EPBK','EPBY','EPML'), 33")
-assert abs(v-143.5)<0.1 and b==('EPBK','EPBY','EPML') and n==33, "BAZA SIE NIE ZGADZA"
+assert abs(v-143.5)<0.1 and b==('EPBK','EPBY','EPML') and n==33, "BASELINE DOES NOT MATCH"
 print("  MATCHES\n")
 BASE=('EPBK','EPBY','EPML')
 
@@ -149,24 +148,27 @@ def line(label, val, bases, extra=""):
     same = "= baseline" if tuple(bases)==BASE else "CHANGED"
     print(f"  {label:28} {val:6.1f} min  {same:7} {','.join(bases)}  {extra}")
 
+# One speed grid serves the printout, the summary and the result file.
+SIATKA=[(VH,VS) for VH in (204,240,276) for VS in (280,330,380)]
+
 print("\n########## A. SENSITIVITY TO SPEEDS (baseline VH=240, VS=330) ##########")
 print("  setting                   result     status  bases")
 keep=0; tot=0
-for VH in (204,240,276):
-    for VS in (280,330,380):
-        v,b,n=solve(VH=VH,VS=VS)
-        tot+=1; keep+= (tuple(b)==BASE)
-        line(f"VH={VH} VS={VS}", v, b)
+for VH,VS in SIATKA:
+    v,b,n=solve(VH=VH,VS=VS)
+    tot+=1; keep+= (tuple(b)==BASE)
+    line(f"VH={VH} VS={VS}", v, b)
 print(f"  --> base triple unchanged in {keep}/{tot} speed combinations")
 
-print("\n########## B. SENSITIVITY TO RUNWAY THRESHOLD (baseline 750 m) ##########")
+print("\n########## B. SENSITIVITY TO THE AIRFIELD SET (the two audited sets) ##########")
 print("  setting                   result     status  bases")
-kb=0; tb=0
-for thr in (700,750,800,900,1000):
-    v,b,n=solve(thr_m=thr)
-    tb+=1; kb+=(tuple(b)==BASE)
-    line(f"threshold={thr} m  (|AF|={n})", v, b)
-print(f"  --> base triple unchanged in {kb}/{tb} thresholds")
+# The runway threshold is not a continuous variable here. The audit gives two
+# sets, so the script compares the two sets and not a grid of thresholds.
+ZBIORY=(("main","main, 875 m hard and 1050 m grass"),
+        ("extended","extended, 758 m hard and 890 m grass"))
+for zb,opis in ZBIORY:
+    v,b,n=solve(zbior=zb)
+    line(f"{opis} (|AF|={n})", v, b)
 
 print("\n########## C. SENSITIVITY TO THE SOURCE SET ##########")
 print("  setting                   result     status  bases")
@@ -178,27 +180,25 @@ for m,desc in modes:
     line(desc, v, b)
 
 print("\n########## STABILITY SUMMARY ##########")
-allres=[]
-for VH in (204,240,276):
-    for VS in (280,330,380):
-        allres.append(solve(VH=VH,VS=VS)[1])
-for thr in (700,750,800,900,1000):
-    allres.append(solve(thr_m=thr)[1])
+allres=[solve(VH=VH,VS=VS)[1] for VH,VS in SIATKA]
 same=sum(1 for b in allres if tuple(b)==BASE)
-print(f"  Speed and threshold perturbations in total: {len(allres)}")
-print(f"  Triple Bialystok, Bydgoszcz, Mielec retained: {same}/{len(allres)}")
-# zakres wartosci na bazowych zrodlach przy bazowym progu, po predkosciach
-vals=[solve(VH=VH,VS=VS)[0] for VH in (204,240,276) for VS in (280,330,380)]
-print(f"  Worst time across the speed grid: {min(vals):.0f} do {max(vals):.0f} min")
+print(f"  Triple Bialystok, Bydgoszcz, Mielec retained across the speed grid: {same}/{len(allres)}")
+zm=tuple(solve(zbior=ZBIORY[1][0])[1])!=BASE
+print(f"  Extended airfield set: triple {'changed' if zm else 'retained'}")
+# range of values over the speed grid, baseline sources and main set
+vals=[solve(VH=VH,VS=VS)[0] for VH,VS in SIATKA]
+print(f"  Worst time across the speed grid: {min(vals):.0f} to {max(vals):.0f} min")
 
-# save results in machine-readable form
-_w = {"baseline": {}, "runway_threshold_m": {}, "speed": {}, "sources": {}}
+# --- machine-readable results ---
+# The block below computes nothing new. It calls solve(), the same function
+# the whole script uses.
+_w = {"baseline": {}, "airfield_set": {}, "speed": {}, "sources": {}}
 _v, _b, _n = solve()
 _w["baseline"] = {"worst_min": round(_v, 1), "bases": list(_b), "airfields": _n}
-for _thr in (700, 750, 800, 875, 900, 1000):
-    _v, _b, _n = solve(thr_m=_thr)
-    _w["runway_threshold_m"][str(_thr)] = {"worst_min": round(_v, 1), "bases": list(_b), "airfields": _n}
-for _vh, _vs in ((200, 330), (240, 330), (280, 330), (240, 280), (240, 380)):
+for _zb, _ in ZBIORY:
+    _v, _b, _n = solve(zbior=_zb)
+    _w["airfield_set"][_zb] = {"worst_min": round(_v, 1), "bases": list(_b), "airfields": _n}
+for _vh, _vs in SIATKA:
     _v, _b, _n = solve(VH=float(_vh), VS=float(_vs))
     _w["speed"][f"VH{_vh}_VS{_vs}"] = {"worst_min": round(_v, 1), "bases": list(_b)}
 for _sm in ("centroids", "osrodki", "airports"):
@@ -206,7 +206,7 @@ for _sm in ("centroids", "osrodki", "airports"):
         _v, _b, _n = solve(src_mode=_sm)
         _w["sources"][_sm] = {"worst_min": round(_v, 1), "bases": list(_b)}
     except Exception as _e:
-        _w["sources"][_sm] = {"error": str(_e)}   # jawnie, nie po cichu
+        _w["sources"][_sm] = {"error": str(_e)}   # recorded, not silenced
 with open(_os.path.join(RESULTS, "sensitivity.json"), "w", encoding="utf-8") as _f:
     json.dump(_w, _f, ensure_ascii=False, indent=2)
 print(f"  saved results/sensitivity.json")

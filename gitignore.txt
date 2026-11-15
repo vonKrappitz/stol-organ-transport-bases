@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+*.aux
+*.log
+*.out
+
+# Derived from the released XLSX by script 16, not versioned.
+# The released dataset itself IS in the repository, see data/NHF_transport_data.md
+data/nhf_transport_od.csv

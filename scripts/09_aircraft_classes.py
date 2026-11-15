@@ -1,5 +1,4 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SCRIPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -10,7 +9,7 @@ _DATA_DIR   = _os.path.join(_REPO_DIR, "data")
 RESULTS      = _os.path.join(_REPO_DIR, "results")     # figures and CSV go here
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DATA_DIR)                                  # bare paths read from data/
-# end of path block
+# --- end of the path block ---
 
 import csv, re, json, math
 from itertools import combinations
@@ -35,17 +34,17 @@ with open("runways.csv",newline='',encoding="utf-8") as f:
         ap[a]["rw"].append((ln,r["surface"]))
 ALL=[{"icao":d["icao"],"muni":d["muni"],"lat":d["lat"],"lon":d["lon"],"len":max([l for l,s in d["rw"] if hd(s)])*0.3048} for a,d in ap.items() if [l for l,s in d["rw"] if hd(s)]]
 
-# audited set (snapshot 2026-07-18): main conservative set of 33
+# --- audited main set of 33 airfields (conservative runway threshold) ---
 import csv as _csv
 _TROJKA=["EPBY","EPML","EPSY"]
 _CERT13=["EPWA","EPGD","EPKT","EPKK","EPLL","EPPO","EPRZ","EPSC","EPMO","EPWR","EPZG","EPLB","EPRA"]
-_ad4k=[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")) if r["prog_kons"]=="1"]
+_ad4k=[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"]=="1"]
 AUDYT33=sorted(set(_TROJKA+_CERT13+_ad4k))
 
-# hard after audit: certified13 + triple + conservative AD4 with a hard runway + EPBK(1350)
-_ad4rows={r["icao"]:r for r in _csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8"))}
+# hard runways after the audit: certified 13, the triple, audited fields of 875 m or more, EPBK (1350 m)
+_ad4rows={r["icao"]:r for r in _csv.DictReader(open("airfield_audit_thresholds.csv"))}
 AUDYT_TWARDE_OK=set(_CERT13+_TROJKA+["EPBK"]+[ic for ic,r in _ad4rows.items() if r["prog_kons"]=="1" and int(r["tw_max"] or 0)>=875])
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8")); OSR=g["osr"]; CENT=g["cent"]
+g=json.load(open("voivodeship_boundaries.json")); OSR=g["osr"]; CENT=g["cent"]
 WD={"dolnośląskie":(2879271,10.0,10.7,7.95,38,53),"kujawsko-pomorskie":(1996003,9.0,9.2,12.43,27,35),"lubelskie":(2011047,5.0,5.75,7.88,23,22),"lubuskie":(975023,12.0,17.94,14.25,9,21),"łódzkie":(2362519,4.0,5.36,7.55,15,22),"małopolskie":(3429632,7.0,10.56,11.08,46,54),"mazowieckie":(5510527,9.0,8.67,10.16,85,101),"opolskie":(936725,10.0,11.30,11.64,11,13),"podkarpackie":(2071676,4.0,2.84,4.80,13,16),"podlaskie":(1138216,7.0,4.28,15.71,16,27),"pomorskie":(2359573,20.0,23.87,21.62,67,55),"śląskie":(4320130,13.0,13.64,15.83,73,83),"świętokrzyskie":(1168499,4.0,5.75,5.92,23,30),"warmińsko-mazurskie":(1357910,19.0,14.89,10.95,23,27),"wielkopolskie":(3487973,15.0,11.17,15.16,57,67),"zachodniopomorskie":(1631784,13.0,8.32,12.77,40,41)}
 def wgt(k):
     p,a,b,c,d,e=WD[k];return (a*p/1e6+b*p/1e6+c*p/1e6+d+e)/5
@@ -74,7 +73,7 @@ def run(minrwy,VS,rf,term,label,act=5):
             if x<bd:bd=x;bi=i
         return bi,bd
     cair={c:near(la,lo) for c,(la,lo) in OSR.items()}
-    def flt(km):  # czas lotu STOL/jet z trasa i narzutem terminalowym
+    def flt(km):  # flight time with the route factor and the terminal allowance
         return (km*rf)/VS + term/60
     src=[]
     for k,(la,lo) in CENT.items():
@@ -99,20 +98,70 @@ def run(minrwy,VS,rf,term,label,act=5):
             if T>mx:mx=T
             if mx>=best:break
         if mx<best:best=mx;bt=tri
-    # demand-weighted mean for the best triple
+    # demand-weighted typical time for the best triple
     wa=0
     for si,s in enumerate(src):
         pd=min(D[si][b] for b in bt); pos=flt(pd) if pd>0.1 else 0
         wa+=s["w"]*(max(s["feeder"],ST+pos)+s["davg"])
     wa/=W
     bz=", ".join(AF[b]["muni"][:11] for b in bt)
-    print(f"{label:24} | flt {len(AF):2d} | worst {best*60:3.0f} min | w.mean {wa*60:3.0f} min | coverage {'full' if not bads else 'GAP '+str(bads)} | bases {bz}")
+    print(f"{label:24} | flt {len(AF):2d} | worst {best*60:3.0f} min | typ {wa*60:3.0f} min | coverage {'full' if not bads else 'GAP '+str(bads)} | bases {bz}")
+    _KL[label]={"airfields":len(AF),"worst_min":round(best*60,1),"typical_min":round(wa*60,1),
+                "bases_icao":[AF[b]["icao"] for b in bt],"beyond_helicopter_reach":bads}
     return best*60,wa*60
 
-print("Parameters: feeder 240 km/h, start-up 5 min. Activation Caravan 5 min, P180 10 min, Learjet 12 min (single- vs twin-pilot, engine count).\n")
-print(f"{'aircraft':24} | {'flight':3} | {'worst':9} | {'w.mean':6} | coverage | bases")
+_KL={}
+print("Parameters: feeder 240 km/h. Activation Caravan 5 min, P180 10 min, Learjet 12 min (one against two pilots, number of engines).\n")
+print(f"{'aircraft':24} | {'flight':3} | {'worst':9} | {'typical':6} | coverage | bases")
 print("-"*120)
 run("AUDYT33", 330, 1.05, 5,  "STOL Caravan EX VFR", act=5)
 run("AUDYT33", 330, 1.12, 18, "STOL Caravan EX IFR", act=5)
 run(1100,700, 1.12, 18, "Piaggio P180 IFR", act=10)
 run(1536,800, 1.12, 18, "Learjet 45 IFR", act=12)
+with open(_os.path.join(RESULTS, "aircraft_classes.json"), "w", encoding="utf-8") as _f:
+    json.dump(_KL, _f, ensure_ascii=False, indent=2)
+print("  saved results/aircraft_classes.json")
+
+# --- heart with route and terminal overheads on the main bases ---
+# Table 1 reads the heart on the geometric model. The conclusions say the
+# operational reading does not preserve the margin, so that number has to
+# come from a script. Parameters as in the STOL Caravan EX VFR row, bases
+# from the main result.
+PRZEKAZANIA=30          # two handovers of 15 min
+FAZA_DAWCY=(30,60)      # assumed procurement and packing phase, min
+def najgorszy_narzad(narzad, bazy=("EPBK","EPBY","EPML"), VS=330, rf=1.05, term=5, act=5):
+    ST=act/60
+    AF=[a for a in ALL if a["icao"] in AUDYT33]
+    for _ic in set(AUDYT33)-{a["icao"] for a in AF}:
+        for a2,d2 in ap.items():
+            if d2["icao"]==_ic:
+                AF.append({"icao":_ic,"muni":d2["muni"],"lat":d2["lat"],"lon":d2["lon"],"len":1350 if _ic=="EPBK" else 0})
+    def near(la,lo):
+        bi,bd=0,9e9
+        for i,a in enumerate(AF):
+            x=hav(la,lo,a["lat"],a["lon"])
+            if x<bd:bd=x;bi=i
+        return bi,bd
+    def flt(km): return (km*rf)/VS + term/60
+    B=[i for i,a in enumerate(AF) if a["icao"] in bazy]
+    assert len(B)==len(bazy)
+    best=0; wl=None
+    for k,(la,lo) in CENT.items():
+        i,d=near(la,lo)
+        pd=min(hav(AF[b]["lat"],AF[b]["lon"],AF[i]["lat"],AF[i]["lon"]) for b in B)
+        pos=flt(pd) if pd>0.1 else 0
+        for c in VOL[narzad]:
+            ci,cd=near(*OSR[c])
+            T=max(d/VH,ST+pos)+flt(hav(AF[i]["lat"],AF[i]["lon"],AF[ci]["lat"],AF[ci]["lon"]))+cd/VH
+            if T>best: best=T; wl=(k,c)
+    return best*60, wl
+_t,_wl=najgorszy_narzad("heart")
+_g,_=najgorszy_narzad("heart",rf=1.0,term=0)
+_hi=_t+PRZEKAZANIA+FAZA_DAWCY[1]
+print(f"\nHeart with overheads on the main bases: transport {_t:.1f} min (geometric {_g:.1f}), binding {_wl[0]} -> {_wl[1]}; upper estimate cross-clamp to arrival {_hi:.1f} min, {_hi-240:.1f} min past the 240 min threshold")
+_o={"heart":{"transport_geometric_min":round(_g,1),"transport_with_overheads_min":round(_t,1),"door_to_door_min":round(_t+PRZEKAZANIA,1),
+    "cross_clamp_to_arrival_min":[round(_t+PRZEKAZANIA+FAZA_DAWCY[0],1),round(_hi,1)],"past_threshold_240_min":round(_hi-240,1),
+    "binding":list(_wl),"bases_icao":["EPBK","EPBY","EPML"]}}
+with open(_os.path.join(RESULTS, "heart_with_overheads.json"), "w", encoding="utf-8") as _f:
+    json.dump(_o, _f, ensure_ascii=False, indent=2)
+print("  saved results/heart_with_overheads.json")

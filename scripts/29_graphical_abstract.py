@@ -1,7 +1,6 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# paths relative to the repository root
+# --- paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SCRIPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -12,16 +11,15 @@ _DANE_DIR = _os.path.join(_REPO_DIR, "data")
 FIGURES = _os.path.join(_REPO_DIR, "figures")
 _os.makedirs(FIGURES, exist_ok=True)
 _os.chdir(_DANE_DIR)
-# end of path block
+# --- end of the path block ---
 
 """29_graphical_abstract.py
 
-Graphical abstract in the aspect ratio required by the journal.
+Graphical abstract in the wide format that journals ask for.
 
-Rationale. The guidelines require 531 x 1328 points, i.e. a WIDE image
-with ratio about 2.5 to 1, legible at 5 x 13 cm. The minimax map is nearly
-square and does not meet this, so it served as the abstract against the
-checklist. This script composes a map with three numbers that carry the result.
+The guidelines ask for 531 by 1328 points, an image about 2.5 times wider than
+tall. The minimax map is nearly square, so this script sets the map beside the
+three numbers that carry the result.
 """
 import csv
 import json
@@ -46,9 +44,9 @@ except ImportError:
 R = 6371.0
 BAZY = {"EPBK": ("Białystok", 53.1014, 23.1706),
         "EPBY": ("Bydgoszcz", 53.0968, 17.9777),
-        "EPML": ("Mielec", 50.3223, 21.4620)}
+        "EPML": ("Mielec", 50.3223, 21.4621)}
 
-g = json.load(open("voivodeship_boundaries.json", encoding="utf-8"))
+g = json.load(open("voivodeship_boundaries.json"))
 OSR = g["osr"]
 
 fig, (axm, axt) = plt.subplots(
@@ -56,7 +54,7 @@ fig, (axm, axt) = plt.subplots(
 
 # --- left panel: map ---
 try:
-    gj = json.load(open("wojewodztwa.geojson", encoding="utf-8"))
+    gj = json.load(open("wojewodztwa.geojson"))
     for f in gj["features"]:
         geom = f["geometry"]
         czesci = geom["coordinates"] if geom["type"] == "MultiPolygon" else [geom["coordinates"]]
@@ -85,6 +83,15 @@ axt.text(0.0, 0.93, "Where the matrix is missing,\nthe siting decision still hol
 WIERSZE = [("143.5 min", "worst mission, three bases"),
            ("125.2 min", "unimprovable geometric bound"),
            ("45.0 to 89.1", "mean identified only to an interval, min")]
+# The bases and the three numbers are typed in. This check keeps them equal
+# to the results of scripts 19, 27 and 23.
+_res=_os.path.join(_REPO_DIR,"results")
+if all(_os.path.exists(_os.path.join(_res,_p)) for _p in ('minimax_audit.json', 'lower_bound.json', 'frechet_invariance.json')):
+    _a=[v["p"]["3"] for v in json.load(open(_os.path.join(_res,'minimax_audit.json'),encoding="utf-8")).values() if v["airfields"]==33][0]
+    assert abs(_a["worst_min"]-143.5)<0.05 and all(_ic in _a["bases"] for _ic in BAZY), _a
+    assert abs(json.load(open(_os.path.join(_res,'lower_bound.json'),encoding="utf-8"))["ograniczenie_min"]-125.2)<0.05
+    _fr=json.load(open(_os.path.join(_res,'frechet_invariance.json'),encoding="utf-8"))
+    assert round(_fr["min_min_min"],1)==45.0 and round(_fr["min_max_min"],1)==89.1, _fr
 y = 0.56
 for duza, opis in WIERSZE:
     axt.text(0.0, y, duza, fontsize=21, weight="bold", color="#1f77b4", va="center")
@@ -101,5 +108,5 @@ plt.close()
 from PIL import Image
 im = Image.open(sciezka)
 print(f"OK graphical abstract {im.size}, aspect ratio {im.width/im.height:.2f}")
-print(f"   required ratio >= {1328/531:.2f}, minimum 1328 px width")
-print(f"   {'MEETS' if im.width/im.height >= 1328/531 and im.width >= 1328 else 'DOES NOT MEET'}")
+print(f"   required aspect ratio >= {1328/531:.2f}, minimum width 1328 px")
+print(f"   {'MEETS IT' if im.width/im.height >= 1328/531 and im.width >= 1328 else 'DOES NOT MEET IT'}")

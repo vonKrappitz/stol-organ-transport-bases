@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Full reproduction of all results in the manuscript.
+# Full reproduction of Paper VI.
 #
-# Runs every script in order. Paths are relative to the repository root,
-# so the file can be started from any working directory.
+# Runs every script in order, then checks that every announced result file
+# exists. Paths are relative to the repository root, so the file can be started
+# from any working directory.
 
 set -u
 cd "$(dirname "$0")"
@@ -35,21 +36,36 @@ sys.exit(1)
 PY
 }
 
-echo "=== Full reproduction ==="
+echo "=== Paper VI: full reproduction ==="
 echo "Scripts read from data/ and write results to results/ and figures to figures/"
 echo ""
 
 SKIPPED=0
+MISSING_LIB=0
+RUN=0
+FAILED=0
 COUNT=0
 for s in scripts/0[1-9]_*.py scripts/1[0-9]_*.py scripts/2[0-9]_*.py; do
     [ -e "$s" ] || continue
     COUNT=$((COUNT+1))
+    # Script 03 fetches the voivodeship boundaries and geocodes the centres over
+    # the network. Its output is already in data/, so it is skipped when present.
+    case "$s" in
+      *03_geocoding*)
+        if [ -s data/voivodeship_boundaries.json ]; then
+          echo ">>> $s  [SKIPPED: data/voivodeship_boundaries.json is present, no network needed]"
+          echo ""
+          SKIPPED=$((SKIPPED+1)); continue
+        fi
+        ;;
+    esac
     if missing_lib "$s"; then
       echo ">>> $s  [SKIPPED: missing library, see requirements.txt]"
-      SKIPPED=$((SKIPPED+1)); continue
+      SKIPPED=$((SKIPPED+1)); MISSING_LIB=$((MISSING_LIB+1)); continue
     fi
+    RUN=$((RUN+1))
     echo ">>> $s"
-    python3 "$s" || echo ">>> $s FAILED"
+    python3 "$s" || { echo ">>> $s FAILED"; FAILED=$((FAILED+1)); }
     echo ""
 done
 
@@ -73,6 +89,9 @@ expected = {
     "results/mission_loss_distribution.json", "results/frechet_invariance.json",
     "results/invariance_boundary.json", "results/margin_perturbation.json",
     "results/lower_bound.json", "results/optimal_set.json",
+    "results/feeder_configurations.json", "results/heart_with_overheads.json",
+    "results/aircraft_classes.json", "results/source_sets.json",
+    "results/coverage_thresholds.json", "results/transport_flows.json",
 }
 missing = sorted(f for f in expected if not os.path.exists(f))
 empty = sorted(f for f in expected if os.path.exists(f) and os.path.getsize(f) < 10)
@@ -83,14 +102,27 @@ for f in empty:
 print(f"  result files: {len(expected) - len(missing)} of {len(expected)}")
 sys.exit(1 if missing or empty else 0)
 PY
+CHECK=$?
 echo ""
+echo "Note: the four-layer validator (_walidator.py) checks the manuscript,"
+echo "the supplementary material, the cover letter and the highlights against"
+echo "these result files. It lives with the submission package, not here,"
+echo "because this repository holds only the code and the data."
+echo ""
+
 echo "=== Done ==="
-echo "Scripts run:      $COUNT of $TOTAL"
+echo "Scripts run:      $RUN of $TOTAL"
 echo "Skipped:          $SKIPPED"
+echo "Failed:           $FAILED"
 echo "Numeric results:  results/*.json"
 echo "Figures:          figures/*.png"
-if [ "$SKIPPED" -gt 0 ]; then
+if [ "$MISSING_LIB" -gt 0 ]; then
   echo ""
   echo "NOTE: some scripts were skipped for missing libraries."
   echo "Install them with: pip install -r requirements.txt"
+fi
+
+# A failed script or a missing result file ends the run with a non-zero code.
+if [ "$FAILED" -gt 0 ] || [ "$CHECK" -ne 0 ]; then
+  exit 1
 fi

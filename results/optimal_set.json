@@ -1,21 +1,32 @@
 {
  "optimum_min": 143.5,
- "optimal_triples": 14,
- "within_5min": 126,
- "within_10min": 722,
- "necessary_bases": [
-  "EPML"
+ "tolerancja_min": 0.05,
+ "trojek_optymalnych": 42,
+ "trojek_remis_dokladny": 14,
+ "rozstep_s": 0.21,
+ "nastepna_wartosc_min": 144.3,
+ "odstep_nastepnej_s": 52.9,
+ "w_promieniu_5min": 126,
+ "w_promieniu_10min": 722,
+ "worst_triple_min": 216.4,
+ "spread_min": 73.0,
+ "pozycja_wymuszona": [
+  "EPML",
+  "EPRJ",
+  "EPRZ"
  ],
  "share": {
+  "EPSY": 18,
   "EPML": 14,
-  "EPSY": 6,
-  "EPBK": 4,
-  "EPSU": 4,
-  "EPBY": 3,
-  "EPPI": 3,
-  "EPPO": 3,
-  "EPSC": 3,
-  "EPLS": 1,
-  "EPZG": 1
+  "EPRJ": 14,
+  "EPRZ": 14,
+  "EPBK": 12,
+  "EPSU": 12,
+  "EPBY": 9,
+  "EPPI": 9,
+  "EPPO": 9,
+  "EPSC": 9,
+  "EPLS": 3,
+  "EPZG": 3
  }
 }

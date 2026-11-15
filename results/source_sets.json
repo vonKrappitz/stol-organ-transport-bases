@@ -1,0 +1,38 @@
+{
+  "16 centroids": {
+    "worst_min": 143.5,
+    "bases_icao": [
+      "EPBK",
+      "EPBY",
+      "EPML"
+    ],
+    "binding": "lubelskie"
+  },
+  "18 hospitals": {
+    "worst_min": 134.0,
+    "bases_icao": [
+      "EPBK",
+      "EPML",
+      "EPPI"
+    ],
+    "binding": "Rzeszów#13"
+  },
+  "34 combined": {
+    "worst_min": 143.5,
+    "bases_icao": [
+      "EPBK",
+      "EPBY",
+      "EPML"
+    ],
+    "binding": "lubelskie"
+  },
+  "hospital_bases_on_centroids_min": 143.5,
+  "hospitals_without_EPPI": {
+    "worst_min": 140.0,
+    "bases_icao": [
+      "EPKR",
+      "EPPO",
+      "EPSY"
+    ]
+  }
+}

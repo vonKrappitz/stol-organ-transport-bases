@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
 """
 26_margin_perturbation.py
 
-MARGIN PERTURBATION TEST.
-
-The source margins are constructed, not observed directly. This script
-perturbs every margin by a random factor U[0.8, 1.2] and re-runs the
-full Frechet-class optimization (three criteria) 200 times.
-
-Question: does the invariance result and the optimal triple survive
-margin error, or is it an artifact of the constructed margins?
+Perturbation of the margins over the Frechet set.
+The first part repeats the data block of script 23.
 """
-# paths relative to the repository root
+# --- paths relative to the repository ---
 import os as _os
 try:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -23,14 +16,14 @@ _DANE_DIR = _os.path.join(_REPO_DIR, "data")
 RESULTS = _os.path.join(_REPO_DIR, "results")
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DANE_DIR)
-# end of path block
+# --- end of the path block ---
 
 import csv, re, json, math
 from itertools import combinations
 import numpy as np
 from scipy.optimize import linprog
 
-# ---------- data: identical to 05_compare_methods.py ----------
+# ---------- data: as in 05_compare_methods ----------
 keep = {"small_airport", "medium_airport", "large_airport"}
 ap = {}
 with open("airports.csv", newline='', encoding="utf-8") as f:
@@ -42,7 +35,7 @@ with open("airports.csv", newline='', encoding="utf-8") as f:
 
 _TROJKA = ["EPBY", "EPML", "EPSY"]
 _CERT13 = ["EPWA", "EPGD", "EPKT", "EPKK", "EPLL", "EPPO", "EPRZ", "EPSC", "EPMO", "EPWR", "EPZG", "EPLB", "EPRA"]
-_ad4k = [r["icao"] for r in csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")) if r["prog_kons"] == "1"]
+_ad4k = [r["icao"] for r in csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"] == "1"]
 AUDYT33 = sorted(set(_TROJKA + _CERT13 + _ad4k))
 AF = [{"icao": d["icao"], "muni": d["muni"], "lat": d["lat"], "lon": d["lon"]}
       for a, d in ap.items() if d["icao"] in AUDYT33]
@@ -52,7 +45,7 @@ for _ic in set(AUDYT33) - {a["icao"] for a in AF}:
             AF.append({"icao": _ic, "muni": d["muni"], "lat": d["lat"], "lon": d["lon"]})
 assert len(AF) == 33, len(AF)
 
-g = json.load(open("voivodeship_boundaries.json", encoding="utf-8")); CENT = g["cent"]; OSR = g["osr"]
+g = json.load(open("voivodeship_boundaries.json")); CENT = g["cent"]; OSR = g["osr"]
 WD = {"dolnośląskie": (2879271, 10.0, 10.7, 7.95, 38, 53), "kujawsko-pomorskie": (1996003, 9.0, 9.2, 12.43, 27, 35),
       "lubelskie": (2011047, 5.0, 5.75, 7.88, 23, 22), "lubuskie": (975023, 12.0, 17.94, 14.25, 9, 21),
       "łódzkie": (2362519, 4.0, 5.36, 7.55, 15, 22), "małopolskie": (3429632, 7.0, 10.56, 11.08, 46, 54),
@@ -84,17 +77,17 @@ WOJ = list(CENT.keys())
 sair = {k: near(la, lo) for k, (la, lo) in CENT.items()}
 
 # ---------- margins ----------
-# d_i : donor count of the voivodeship (mean 2020-2024)
+# d_i : donors of the voivodeship (mean 2020-2024)
 D = np.array([wgt(k) for k in WOJ])
 # r_k^o : transplant volume of centre k for organ o
 ORG = list(VOL.keys())
-# donors are split across organs proportionally to the organ share,
-# so that row and column sums close in every Frechet set
+# donors are split between organs in proportion to the organ's share, so that
+# row and column sums balance in every Frechet set
 Rtot = {o: sum(VOL[o].values()) for o in ORG}
 TOT = sum(Rtot.values())
 
 print("=" * 78)
-print("MARGINS (observed)")
+print("MARGINS")
 print("=" * 78)
 print(f"  sources: {len(WOJ)} voivodeships, donors in total {D.sum():.1f}/year")
 for o in ORG:
@@ -103,7 +96,7 @@ print(f"  total volume {TOT}")
 
 # ---------- times ----------
 # A_i(x) = max(feeder_i, ST + positioning_i(x))   [depends on x, not on k,o]
-# B_ik   = flight(a(i)->c(k)) + feeder_k            [depends on (i,k), not on x]
+# B_ik   = flight(a(i)->c(k)) + feeder_k           [depends on (i,k), not on x]
 feeder_src = np.array([sair[k][1] / VH for k in WOJ])
 Dist_base = np.array([[hav(AF[b]["lat"], AF[b]["lon"], AF[sair[k][0]]["lat"], AF[sair[k][0]]["lon"])
                        for b in range(len(AF))] for k in WOJ])
@@ -125,7 +118,7 @@ def A_of(tri):
 
 # ---------- Frechet set: bounds over the coupling ----------
 def frechet_extremum(Bo, d_o, r_o, sense):
-    """max lub min sum_ik q_ik B_ik po politopie transportowym."""
+    """Maximum or minimum of sum_ik q_ik B_ik over the transport polytope."""
     n, m = Bo.shape
     c = Bo.reshape(-1)
     if sense == "max": c = -c
@@ -145,6 +138,14 @@ def frechet_extremum(Bo, d_o, r_o, sense):
 # =====================================================================
 # MARGIN PERTURBATION
 # =====================================================================
+# The margins carry error themselves: donor counts are a five-year mean and
+# transplant volumes come from one year. The invariance proposition should
+# survive that error.
+#
+# Test. Each donor margin and each centre volume is multiplied by an independent
+# factor drawn uniformly from [0.8, 1.2]. For each draw the triple is computed
+# under the three criteria over the Frechet set, and the script checks whether
+# all three still name the same triple.
 import numpy as _np
 
 LOSOWAN = 200
@@ -196,8 +197,8 @@ print(f"  same triple as without perturbation:                {ta_sama}/{LOSOWAN
 
 import json as _json
 with open(_os.path.join(RESULTS, "margin_perturbation.json"), "w", encoding="utf-8") as f:
-    _json.dump({"draws": LOSOWAN, "range": [0.8, 1.2],
-                "invariance_held": zgodne,
-                "same_triple": ta_sama,
-                "base_triple": sorted(AF[b]["muni"] for b in baza["dro"])}, f, ensure_ascii=False, indent=1)
+    _json.dump({"losowan": LOSOWAN, "zakres": [0.8, 1.2],
+                "niezmienniczosc_utrzymana": zgodne,
+                "ta_sama_trojka": ta_sama,
+                "trojka_bazowa": sorted(AF[b]["muni"] for b in baza["dro"])}, f, ensure_ascii=False, indent=1)
 print(f"\n  saved {_os.path.join(RESULTS, 'margin_perturbation.json')}")

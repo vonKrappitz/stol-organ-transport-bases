@@ -1,0 +1,50 @@
+{
+ "HEMS-STOL-HEMS": {
+  "najgorszy_min": 160.1,
+  "typowy_min": 94.1,
+  "wiaze": "lubelskie->Szczecin",
+  "dowoz_zrodla_km": 13.2,
+  "serce_najgorszy_min": 157.4,
+  "serce_wiaze": "zachodniopomorskie->Kraków",
+  "serce_od_zacisku_do_przylotu_min": [
+   217.4,
+   247.4
+  ]
+ },
+ "GEMS-STOL-HEMS": {
+  "najgorszy_min": 189.7,
+  "typowy_min": 98.6,
+  "wiaze": "opolskie->Szczecin",
+  "dowoz_zrodla_km": 85.5,
+  "serce_najgorszy_min": 183.7,
+  "serce_wiaze": "opolskie->Gdańsk",
+  "serce_od_zacisku_do_przylotu_min": [
+   243.7,
+   273.7
+  ]
+ },
+ "HEMS-STOL-GEMS": {
+  "najgorszy_min": 182.2,
+  "typowy_min": 104.2,
+  "wiaze": "lubelskie->Szczecin",
+  "dowoz_zrodla_km": 13.2,
+  "serce_najgorszy_min": 170.3,
+  "serce_wiaze": "zachodniopomorskie->Kraków",
+  "serce_od_zacisku_do_przylotu_min": [
+   230.3,
+   260.3
+  ]
+ },
+ "GEMS-STOL-GEMS": {
+  "najgorszy_min": 211.9,
+  "typowy_min": 108.7,
+  "wiaze": "opolskie->Szczecin",
+  "dowoz_zrodla_km": 85.5,
+  "serce_najgorszy_min": 194.2,
+  "serce_wiaze": "opolskie->Gdańsk",
+  "serce_od_zacisku_do_przylotu_min": [
+   254.2,
+   284.2
+  ]
+ }
+}

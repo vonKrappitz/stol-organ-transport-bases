@@ -25,7 +25,18 @@
       },
       "3": {
         "worst_min": 143.5,
-        "bases": "EPBK(Białystok), EPBY(Bydgoszcz), EPML(Mielec)"
+        "bases": "EPBK(Białystok), EPBY(Bydgoszcz), EPML(Mielec)",
+        "binding": {
+          "source": "lubelskie",
+          "organ": "lungs",
+          "centre": "Szczecin",
+          "feeder_km": 13.2,
+          "feeder_min": 3.3,
+          "positioning_km": 134.7,
+          "positioning_min": 24.5,
+          "activation_min": 5.0,
+          "onward_min": 114.0
+        }
       },
       "4": {
         "worst_min": 134.0,
@@ -47,6 +58,23 @@
       "4": {
         "worst_min": 134.7,
         "bases": "EPBK(Białystok), EPBY(Bydgoszcz), EPMY(Nowogródek P), EPST(Zaleszany)"
+      }
+    }
+  },
+  "S2b conservative without conditional EPPI": {
+    "airfields": 32,
+    "p": {
+      "2": {
+        "worst_min": 150.0,
+        "bases": "EPBY(Bydgoszcz), EPLB(Lublin)"
+      },
+      "3": {
+        "worst_min": 143.5,
+        "bases": "EPBK(Białystok), EPBY(Bydgoszcz), EPML(Mielec)"
+      },
+      "4": {
+        "worst_min": 140.0,
+        "bases": "EPCD(Królewskie), EPKR(Krosno), EPPO(Poznań), EPSY(Szymany)"
       }
     }
   },

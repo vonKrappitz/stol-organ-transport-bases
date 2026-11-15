@@ -1,36 +1,36 @@
 {
-  "variants": {
-    "(a) pairs with disclosed count": {
+  "warianty": {
+    "(a) pary z liczba jawna": {
       "n": 50,
-      "spearman": 0.015,
+      "spearman": 0.0148,
       "p_spearman": 0.9185872323803564,
-      "kendall": 0.01,
+      "kendall": 0.0099,
       "p_kendall": 0.923654333274561
     },
-    "(b) occurring pairs, cens=2": {
+    "(b) pary wystepujace, cenz=2": {
       "n": 130,
-      "spearman": 0.05,
+      "spearman": 0.0497,
       "p_spearman": 0.5742874945826776,
-      "kendall": 0.037,
+      "kendall": 0.0372,
       "p_kendall": 0.5628863932698493
     },
-    "(c) all 240 pairs, zeros": {
+    "(c) wszystkie 240 par, zera": {
       "n": 240,
-      "spearman": 0.322,
+      "spearman": 0.3216,
       "p_spearman": 3.541313415599109e-07,
-      "kendall": 0.256,
+      "kendall": 0.2558,
       "p_kendall": 4.745537436954545e-07
     }
   },
-  "against_distance": {
-    "observed_vs_distance": {
-      "spearman": -0.617,
-      "p": 5.2135354500608574e-15,
+  "wobec_odleglosci": {
+    "obserwacja_vs_odleglosc": {
+      "spearman": -0.6173,
+      "p": 5.213535450060853e-15,
       "n": 130
     },
-    "proxy_vs_distance": {
+    "proxy_vs_odleglosc": {
       "spearman": 0.236,
-      "p": 0.006858274620694388,
+      "p": 0.0068582746206943875,
       "n": 130
     }
   }

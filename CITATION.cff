@@ -12,14 +12,14 @@ authors:
     orcid: 'https://orcid.org/0009-0008-7419-0851'
     email: maciej_kasperek@protonmail.ch
     affiliation: Independent researcher, Opole, Poland
-version: 1.0.0
+version: 2.0.0
 doi: 10.5281/zenodo.22033142
-date-released: '2026-08-20'
+date-released: '2026-11-15'
 license: Apache-2.0
 license-url: 'https://www.apache.org/licenses/LICENSE-2.0'
 keywords:
   - facility location
-  - p-center
+  - p-centre
   - minimax
   - partial identification
   - robust optimization
@@ -29,11 +29,11 @@ keywords:
   - reproducibility
 abstract: >-
   Code, input data, and scripts reproducing every figure and every number in
-  the manuscript. The work locates three short takeoff and landing aircraft
+  the manuscript. The work locates three short take-off and landing aircraft
   bases for time-critical organ transport in Poland, using a minimax criterion
   over admissible source-centre pairs, because no central record of
   donor-recipient pairs is kept. All four location models are solved by
-  exhaustive enumeration of the 5456 airfield triples, so the optima are exact.
+  exhaustive enumeration of the 5 456 airfield triples, so the optima are exact.
 references:
   - type: article
     title: >-

@@ -1,0 +1,12 @@
+{
+  "flows_total": 5991,
+  "median_km": 143,
+  "mean_km": 152,
+  "above_300km": {
+    "pairs": 35,
+    "flows_censored_as_2": 156,
+    "cells": 78,
+    "per_year_low": 15.6,
+    "per_year_high": 62.4
+  }
+}

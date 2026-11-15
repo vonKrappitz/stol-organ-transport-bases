@@ -1,5 +1,4 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SCRIPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
@@ -10,14 +9,14 @@ _DATA_DIR   = _os.path.join(_REPO_DIR, "data")
 RESULTS      = _os.path.join(_REPO_DIR, "figures")     # figures and CSV go here
 _os.makedirs(RESULTS, exist_ok=True)
 _os.chdir(_DATA_DIR)                                  # bare paths read from data/
-# end of path block
+# --- end of the path block ---
 
-import csv, json, re, json, math, requests
+import csv, json, re, math, requests
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-# Shapely is used only to draw voivodeship outlines. Without it,
-# coordinates are read straight from the GeoJSON; the result is the same.
+# Shapely is used here only to draw the voivodeship outlines. Without it the
+# coordinates are read straight from the GeoJSON and the result is the same.
 try:
     from shapely.geometry import shape
     _MA_SHAPELY = True
@@ -25,9 +24,9 @@ except ImportError:
     _MA_SHAPELY = False
     def shape(g):
         return g
-# Voivodeship boundaries: local copy first, network second, so
-# rerunning works offline.
-_GEOJ = _os.path.join(_DANE_DIR, "wojewodztwa.geojson") if "_DANE_DIR" in dir() else "wojewodztwa.geojson"
+# Voivodeship boundaries: the local copy first, the network only when it is
+# missing, so that a repeated run needs no network.
+_GEOJ = _os.path.join(_DATA_DIR, "wojewodztwa.geojson")
 if _os.path.exists(_GEOJ):
     gj = json.load(open(_GEOJ, encoding="utf-8"))
 else:
@@ -58,10 +57,16 @@ with open("runways.csv",newline='',encoding="utf-8") as f:
         try:ln=int(r["length_ft"])
         except:continue
         ap[a]["rw"].append((ln,r["surface"]))
-AF={d["icao"]:d for a,d in ap.items() if [l for l,s in d["rw"] if hd(s)] and max([l for l,s in d["rw"] if hd(s)])*0.3048>=750}
-# KOREKTA AUDYTU R10 (2026-07-18): EPBK Krywlany ma pas twardy 1350x30 (2018), brak w OurAirports
-if "EPBK" not in AF and "EPBK" in ap: AF["EPBK"]=ap["EPBK"]
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8")); OSR=g["osr"]; CENT=g["cent"]
+# The candidates drawn on the map are the audited main set of 33 airfields,
+# the same set the computations use (scripts 05 and 19).
+import csv as _csv
+_TROJKA=["EPBY","EPML","EPSY"]
+_CERT13=["EPWA","EPGD","EPKT","EPKK","EPLL","EPPO","EPRZ","EPSC","EPMO","EPWR","EPZG","EPLB","EPRA"]
+AUDYT33=sorted(set(_TROJKA+_CERT13+[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"]=="1"]))
+_po_icao={d["icao"]:d for a,d in ap.items()}
+AF={ic:_po_icao[ic] for ic in AUDYT33}
+assert len(AF)==33, len(AF)
+g=json.load(open("voivodeship_boundaries.json")); OSR=g["osr"]; CENT=g["cent"]
 def circ(lat,lon,km,n=120):
     R=6371.0;d=km/R;la1=math.radians(lat);lo1=math.radians(lon);xs=[];ys=[]
     for i in range(n+1):
@@ -84,11 +89,15 @@ def base(ax,title):
     for sp in ax.spines.values():sp.set_visible(False)
     ax.set_title(title,fontsize=12,weight="bold",color="#1a1a2e")
 
-# ---- map A: bases minimax + circles 100 km ----
+# ---- map A: minimax bases with 100 km circles ----
 fig,ax=plt.subplots(figsize=(8.4,8.8))
 base(ax,"Minimax  |  100 km helicopter reach around 3 bases (zero-positioning zone)")
 for ic,d in AF.items(): ax.scatter(d["lon"],d["lat"],s=6,color="#9aa0aa",zorder=3)
 BAZY=["EPBK","EPBY","EPML"]
+# The bases are typed in. This check keeps them equal to the minimax result of script 05.
+_cm=_os.path.join(_REPO_DIR,"results","compare_methods.json")
+if _os.path.exists(_cm):
+    assert sorted(BAZY)==sorted(json.load(open(_cm,encoding="utf-8"))['Minimax (worst case)']["bases_icao"]), "BAZY differ from the minimax result of script 05"
 for ic in BAZY:
     d=AF[ic];xs,ys=circ(d["lat"],d["lon"],100)
     ax.fill(xs,ys,color="#1f77b4",alpha=0.13,zorder=1);ax.plot(xs,ys,color="#1f77b4",lw=1.1,alpha=0.6,zorder=4)
@@ -105,9 +114,9 @@ leg=[Line2D([0],[0],marker="^",color="w",markerfacecolor="#1f77b4",markersize=13
 ax.legend(handles=leg,loc="lower left",fontsize=9,frameon=False)
 plt.tight_layout();plt.savefig(_os.path.join(RESULTS, "map_zero_positioning_zones.png"),dpi=350,bbox_inches="tight");plt.close()
 
-# ---- map B: all 33 airfields set main + circles 100 km = full coverage ----
+# ---- map B: all 33 airfields of the main set with 100 km circles ----
 fig,ax=plt.subplots(figsize=(8.4,8.8))
-base(ax,"Full helicopter feeder coverage  |  100 km circles around 33 airfields")
+base(ax,f"Helicopter feeder reach  |  100 km circles around {len(AF)} airfields")
 for ic,d in AF.items():
     xs,ys=circ(d["lat"],d["lon"],100)
     ax.fill(xs,ys,color="#2ca02c",alpha=0.06,zorder=1);ax.plot(xs,ys,color="#2ca02c",lw=0.4,alpha=0.25,zorder=2)
@@ -115,9 +124,9 @@ for ic,d in AF.items(): ax.scatter(d["lon"],d["lat"],s=8,color="#3a7d3a",zorder=
 for c,(la,lo) in OSR.items():
     ax.scatter(lo,la,s=120,marker="*",color="#d62728",edgecolor="white",lw=0.6,zorder=6)
     ax.annotate(c,(lo,la),(4,4),textcoords="offset points",fontsize=8,color="#7a1010",weight="bold")
-leg=[Line2D([0],[0],marker="o",color="w",markerfacecolor="#3a7d3a",markersize=9,label="airfield (33)"),
+leg=[Line2D([0],[0],marker="o",color="w",markerfacecolor="#3a7d3a",markersize=9,label=f"airfield ({len(AF)})"),
      Line2D([0],[0],marker="*",color="w",markerfacecolor="#d62728",markersize=15,label="centre"),
      Line2D([0],[0],marker="o",color="w",markerfacecolor="#2ca02c",alpha=0.25,markersize=13,label="feeder reach 100 km")]
 ax.legend(handles=leg,loc="lower left",fontsize=9,frameon=False)
 plt.tight_layout();plt.savefig(_os.path.join(RESULTS, "map_helicopter_reach.png"),dpi=350,bbox_inches="tight");plt.close()
-print("OK dwie mapy z okregami")
+print("OK two maps with reach circles")

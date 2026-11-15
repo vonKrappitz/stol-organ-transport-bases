@@ -1,0 +1,21 @@
+{
+  "heart": {
+    "transport_geometric_min": 140.8,
+    "transport_with_overheads_min": 157.4,
+    "door_to_door_min": 187.4,
+    "cross_clamp_to_arrival_min": [
+      217.4,
+      247.4
+    ],
+    "past_threshold_240_min": 7.4,
+    "binding": [
+      "zachodniopomorskie",
+      "Kraków"
+    ],
+    "bases_icao": [
+      "EPBK",
+      "EPBY",
+      "EPML"
+    ]
+  }
+}

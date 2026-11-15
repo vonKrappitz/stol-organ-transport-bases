@@ -1,17 +1,18 @@
 {
  "variant": "free choice airfields",
  "invariance": false,
- "bases_max": [
+ "robustness_cost_min": 0.06,
+ "bazy_max": [
   "EPBC",
   "EPBY",
   "EPKT"
  ],
- "bases_ind": [
+ "bazy_ind": [
   "EPBY",
   "EPKT",
   "EPWA"
  ],
- "bases_min": [
+ "bazy_min": [
   "EPBY",
   "EPKM",
   "EPWA"

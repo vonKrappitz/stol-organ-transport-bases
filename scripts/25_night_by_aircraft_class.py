@@ -1,16 +1,15 @@
-# Copyright 2026 Maciej M. Kasperek. Licensed under the Apache License, Version 2.0.
-# paths relative to the repository root
+# --- paths: paths relative to the repository (runs from any working directory) ---
 import os as _os
 try:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(__file__))
 except NameError:
     _SKRYPT_DIR = _os.path.dirname(_os.path.abspath(_os.sys.argv[0])) or _os.getcwd()
-_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # reprodukcja_VI/
+_REPRO_DIR  = _os.path.dirname(_SKRYPT_DIR)          # repository root
 _DANE_DIR   = _os.path.join(_REPRO_DIR, "data")
-RESULTS      = _os.path.join(_REPRO_DIR, "results")     # figury i CSV tu
+RESULTS      = _os.path.join(_REPRO_DIR, "results")     # output folder
 _os.makedirs(RESULTS, exist_ok=True)
-_os.chdir(_DANE_DIR)                                  # gole sciezki czytaja z dane/
-# end of path block
+_os.chdir(_DANE_DIR)                                  # bare paths read from data/
+# --- end of the path block ---
 
 import csv, re, json, math
 from itertools import combinations
@@ -35,19 +34,21 @@ with open("runways.csv",newline='',encoding="utf-8") as f:
         ap[a]["rw"].append((ln,r["surface"]))
 ALL=[{"icao":d["icao"],"muni":d["muni"],"lat":d["lat"],"lon":d["lon"],"len":max([l for l,s in d["rw"] if hd(s)])*0.3048} for a,d in ap.items() if [l for l,s in d["rw"] if hd(s)]]
 
-# Night variant: airfield set restricted to the seven airports open 24h.
+# --- NIGHT VARIANT: seven airports open around the clock ---
+# This script copies script 09 with one change: the airfield set is narrowed
+# to the airports open around the clock.
 CERT_H24=["EPWA","EPGD","EPKT","EPKK","EPRZ","EPMO","EPWR"]
-# audited set (snapshot 2026-07-18): main conservative set of 33
+# --- audited main set of 33 airfields (conservative runway threshold) ---
 import csv as _csv
 _TROJKA=["EPBY","EPML","EPSY"]
 _CERT13=["EPWA","EPGD","EPKT","EPKK","EPLL","EPPO","EPRZ","EPSC","EPMO","EPWR","EPZG","EPLB","EPRA"]
-_ad4k=[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8")) if r["prog_kons"]=="1"]
+_ad4k=[r["icao"] for r in _csv.DictReader(open("airfield_audit_thresholds.csv")) if r["prog_kons"]=="1"]
 AUDYT33=sorted(set(_TROJKA+_CERT13+_ad4k))
 
-# hard after audit: certified13 + triple + conservative AD4 with a hard runway + EPBK(1350)
-_ad4rows={r["icao"]:r for r in _csv.DictReader(open("airfield_audit_thresholds.csv", encoding="utf-8"))}
+# hard runways after the audit: certified 13, the triple, audited fields of 875 m or more, EPBK (1350 m)
+_ad4rows={r["icao"]:r for r in _csv.DictReader(open("airfield_audit_thresholds.csv"))}
 AUDYT_TWARDE_OK=set(_CERT13+_TROJKA+["EPBK"]+[ic for ic,r in _ad4rows.items() if r["prog_kons"]=="1" and int(r["tw_max"] or 0)>=875])
-g=json.load(open("voivodeship_boundaries.json", encoding="utf-8")); OSR=g["osr"]; CENT=g["cent"]
+g=json.load(open("voivodeship_boundaries.json")); OSR=g["osr"]; CENT=g["cent"]
 WD={"dolnośląskie":(2879271,10.0,10.7,7.95,38,53),"kujawsko-pomorskie":(1996003,9.0,9.2,12.43,27,35),"lubelskie":(2011047,5.0,5.75,7.88,23,22),"lubuskie":(975023,12.0,17.94,14.25,9,21),"łódzkie":(2362519,4.0,5.36,7.55,15,22),"małopolskie":(3429632,7.0,10.56,11.08,46,54),"mazowieckie":(5510527,9.0,8.67,10.16,85,101),"opolskie":(936725,10.0,11.30,11.64,11,13),"podkarpackie":(2071676,4.0,2.84,4.80,13,16),"podlaskie":(1138216,7.0,4.28,15.71,16,27),"pomorskie":(2359573,20.0,23.87,21.62,67,55),"śląskie":(4320130,13.0,13.64,15.83,73,83),"świętokrzyskie":(1168499,4.0,5.75,5.92,23,30),"warmińsko-mazurskie":(1357910,19.0,14.89,10.95,23,27),"wielkopolskie":(3487973,15.0,11.17,15.16,57,67),"zachodniopomorskie":(1631784,13.0,8.32,12.77,40,41)}
 def wgt(k):
     p,a,b,c,d,e=WD[k];return (a*p/1e6+b*p/1e6+c*p/1e6+d+e)/5
@@ -60,7 +61,7 @@ VH=240.0
 
 def run(minrwy,VS,rf,term,label,act=5):
     ST=act/60
-    if minrwy=="AUDYT33":  # w tym skrypcie i tak zawezone do CERT_H24
+    if minrwy=="AUDYT33":  # in this script narrowed to CERT_H24 anyway
         AF=[a for a in ALL if a["icao"] in CERT_H24]
         _braki=set(CERT_H24)-{a["icao"] for a in AF}
         for _ic in _braki:
@@ -76,7 +77,7 @@ def run(minrwy,VS,rf,term,label,act=5):
             if x<bd:bd=x;bi=i
         return bi,bd
     cair={c:near(la,lo) for c,(la,lo) in OSR.items()}
-    def flt(km):  # czas lotu STOL/jet z trasa i narzutem terminalowym
+    def flt(km):  # flight time with the route factor and the terminal allowance
         return (km*rf)/VS + term/60
     src=[]
     for k,(la,lo) in CENT.items():
@@ -101,19 +102,19 @@ def run(minrwy,VS,rf,term,label,act=5):
             if T>mx:mx=T
             if mx>=best:break
         if mx<best:best=mx;bt=tri
-    # demand-weighted mean for the best triple
+    # demand-weighted typical time for the best triple
     wa=0
     for si,s in enumerate(src):
         pd=min(D[si][b] for b in bt); pos=flt(pd) if pd>0.1 else 0
         wa+=s["w"]*(max(s["heli"],ST+pos)+s["davg"])
     wa/=W
     bz=", ".join(AF[b]["muni"][:11] for b in bt)
-    print(f"{label:24} | flt {len(AF):2d} | worst {best*60:3.0f} min | w.mean {wa*60:3.0f} min | coverage {'FULL' if not bads else 'GAP '+str(bads)} | bases {bz}")
+    print(f"{label:24} | flt {len(AF):2d} | worst {best*60:3.0f} min | typ {wa*60:3.0f} min | coverage {'FULL' if not bads else 'GAP '+str(bads)} | bases {bz}")
     return best*60,wa*60
 
-print("NIGHT VARIANT, seven airports open 24h (EPWA, EPGD, EPKT, EPKK, EPRZ, EPMO, EPWR)")
-print("Parameters: feeder 240 km/h, start-up 5 min. Activation Caravan 5 min, P180 10 min, Learjet 12 min (single- vs twin-pilot, engine count).\n")
-print(f"{'Aircraft':24} | {'flt':3} | {'worst':9} | {'w.mean':6} | coverage | bases")
+print("NIGHT VARIANT, seven airports open around the clock (EPWA, EPGD, EPKT, EPKK, EPRZ, EPMO, EPWR)")
+print("Parameters: feeder 240 km/h. Activation Caravan 5 min, P180 10 min, Learjet 12 min (one against two pilots, number of engines).\n")
+print(f"{'Aircraft':24} | {'flt':3} | {'worst':9} | {'typical':6} | coverage | bases")
 print("-"*120)
 _r = {}
 _r["STOL Caravan EX VFR"] = run("AUDYT33", 330, 1.05, 5,  "STOL Caravan EX VFR", act=5)
@@ -121,8 +122,9 @@ _r["STOL Caravan EX IFR"] = run("AUDYT33", 330, 1.12, 18, "STOL Caravan EX IFR",
 _r["Piaggio P180 IFR"] = run(1100,700, 1.12, 18, "Piaggio P180 IFR", act=10)
 _r["Learjet 45 IFR"] = run(1536,800, 1.12, 18, "Learjet 45 IFR", act=12)
 
-# save results in machine-readable form
-_out = {_k: {"worst_min": round(_v[0], 1), "weighted_mean_min": round(_v[1], 1)}
+# --- machine-readable results ---
+# The block below saves what run() has just computed and printed.
+_out = {_k: {"worst_min": round(_v[0], 1), "typowy_min": round(_v[1], 1)}
         for _k, _v in _r.items()}
 with open(_os.path.join(RESULTS, "night_by_aircraft_class.json"), "w", encoding="utf-8") as _f:
     json.dump(_out, _f, ensure_ascii=False, indent=2)

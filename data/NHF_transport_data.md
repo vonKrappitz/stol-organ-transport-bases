@@ -7,6 +7,7 @@ Fund, unaltered, including the methodology sheet the Fund prepared.
 
 - Source: National Health Fund of Poland, Head Office, Department of Analyses,
   Quality Monitoring and Optimisation of Services
+- File created: 16 July 2026, according to the file metadata
 - Released: 17 July 2026
 - Case reference: NFZ-DAMJiOS.0143.264.2026, 2026.383310.NAJU
 - Basis: request for public information
@@ -18,6 +19,8 @@ public research repository under the re-use of public sector information regime,
 and raised no objection.
 
 Any use should credit the source, the release date, and the case reference.
+The Fund asks re-users to state the source, the time of creation and of
+acquisition, and whether the information was processed.
 
 ## Contents
 
