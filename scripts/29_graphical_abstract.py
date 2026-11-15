@@ -82,7 +82,7 @@ axt.text(0.0, 0.93, "Where the matrix is missing,\nthe siting decision still hol
          fontsize=17, weight="bold", color="#1a1a2e", va="top", linespacing=1.25)
 WIERSZE = [("143.5 min", "worst mission, three bases"),
            ("125.2 min", "unimprovable geometric bound"),
-           ("45.0 to 89.1", "mean identified only to an interval, min")]
+           ("45.0 to 89.1", "mean mission, min, identified only to an interval,\nat the bases that minimize it (Warsaw, Katowice, Poznań)")]
 # The bases and the three numbers are typed in. This check keeps them equal
 # to the results of scripts 19, 27 and 23.
 _res=_os.path.join(_REPO_DIR,"results")
@@ -92,6 +92,8 @@ if all(_os.path.exists(_os.path.join(_res,_p)) for _p in ('minimax_audit.json', 
     assert abs(json.load(open(_os.path.join(_res,'lower_bound.json'),encoding="utf-8"))["ograniczenie_min"]-125.2)<0.05
     _fr=json.load(open(_os.path.join(_res,'frechet_invariance.json'),encoding="utf-8"))
     assert round(_fr["min_min_min"],1)==45.0 and round(_fr["min_max_min"],1)==89.1, _fr
+    # The interval belongs to the bases that minimize the mean, not to the minimax bases on the map.
+    assert sorted(_fr["bazy_dro"])==["EPBC","EPKM","EPPO"], _fr["bazy_dro"]
 y = 0.56
 for duza, opis in WIERSZE:
     axt.text(0.0, y, duza, fontsize=21, weight="bold", color="#1f77b4", va="center")
@@ -107,6 +109,14 @@ plt.close()
 
 from PIL import Image
 im = Image.open(sciezka)
+# The cropped image can come out narrower than the required proportion, depending on the
+# text width in the local fonts. White margins are added left and right until it holds.
+if im.width / im.height < 1328 / 531:
+    _w = int(math.ceil(im.height * 2.52))
+    _tlo = Image.new("RGB", (_w, im.height), "white")
+    _tlo.paste(im.convert("RGB"), ((_w - im.width) // 2, 0))
+    _tlo.save(sciezka, dpi=(350, 350))
+    im = Image.open(sciezka)
 print(f"OK graphical abstract {im.size}, aspect ratio {im.width/im.height:.2f}")
 print(f"   required aspect ratio >= {1328/531:.2f}, minimum width 1328 px")
 print(f"   {'MEETS IT' if im.width/im.height >= 1328/531 and im.width >= 1328 else 'DOES NOT MEET IT'}")
