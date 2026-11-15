@@ -120,7 +120,7 @@ the Cessna 208B Grand Caravan EX.
 
 The files are the airfield cards of the audit in table form. `thresholds`
 holds the 67 airfields outside the certified group, `certified` 13 certified
-airports, `military` the 15 military airfields. Bydgoszcz, Mielec and
+airports, `military` the 15 military airfields *(14 meeting the threshold)*. Bydgoszcz, Mielec and
 Olsztyn-Mazury were audited one by one. Their cards are in `individual`, which
 has English column names, and the scripts enter these three by their codes.
 Column names in the other three files are in Polish.
