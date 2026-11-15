@@ -7,7 +7,7 @@ message: >-
   associated manuscript.
 type: software
 authors:
-  - given-names: Maciej M.
+  - given-names: Maciej Marcin
     family-names: Kasperek
     orcid: 'https://orcid.org/0009-0008-7419-0851'
     email: maciej_kasperek@protonmail.ch
@@ -40,7 +40,7 @@ references:
       Facility Location under a Partially Identified Demand Coupling: Aircraft
       Bases for Time-Critical Organ Transport in Poland
     authors:
-      - given-names: Maciej M.
+      - given-names: Maciej Marcin
         family-names: Kasperek
         orcid: 'https://orcid.org/0009-0008-7419-0851'
     year: 2026
